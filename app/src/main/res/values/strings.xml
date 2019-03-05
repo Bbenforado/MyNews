@@ -10,8 +10,14 @@
     <string name="three">three</string>
 
     <string-array name="textsFragments">
-    <item>@string/one</item>
-    <item>@string/two</item>
-    <item>@string/three</item>
+        <item>@string/one</item>
+        <item>@string/two</item>
+        <item>@string/three</item>
     </string-array>
+
+    <string name="aboutText">MyNews is a great application that gives you access to news of all around the world!\nGet informed and enjoy!</string>
+    <string name="aboutText2">Developped by B.Benforado studio</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>

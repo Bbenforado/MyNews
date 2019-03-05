@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.blanche.mynews">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -15,6 +17,29 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".controllers.activities.SearchActivity"
+            android:label="Search"
+            android:parentActivityName=".controllers.activities.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".controllers.activities.MainActivity" />
+        </activity>
+        <activity
+            android:name=".controllers.activities.NotificationsActivity"
+            android:label="Notifications"
+            android:parentActivityName=".controllers.activities.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".controllers.activities.MainActivity" />
+        </activity>
+        <activity android:name=".controllers.activities.AboutActivity"
+            android:label="About"
+            android:parentActivityName=".controllers.activities.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".controllers.activities.MainActivity"/>
         </activity>
     </application>
 

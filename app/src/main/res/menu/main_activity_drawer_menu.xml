@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/art_category"
+            android:icon="@drawable/ic_arts"
+            android:title="Arts"/>
+        <item
+            android:id="@+id/business_category"
+            android:icon="@drawable/ic_business"
+            android:title="Business"/>
+        <item
+            android:id="@+id/entrepreneurs_category"
+            android:icon="@drawable/ic_entrepreneurs"
+            android:title="Entrepreneurs"/>
+        <item
+            android:id="@+id/politics_category"
+            android:icon="@drawable/ic_politic"
+            android:title="Politics"/>
+        <item
+            android:id="@+id/sports_category"
+            android:icon="@drawable/ic_sports"
+            android:title="Sports"/>
+        <item
+            android:id="@+id/travel_category"
+            android:icon="@drawable/ic_travels"
+            android:title="Travels"/>
+    </group>
+</menu>
