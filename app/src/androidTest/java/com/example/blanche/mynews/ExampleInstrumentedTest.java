@@ -7,9 +7,11 @@ import android.support.test.runner.AndroidJUnit4;
 import com.example.blanche.mynews.controllers.activities.MainActivity;
 import com.example.blanche.mynews.controllers.activities.SearchActivity;
 import com.example.blanche.mynews.controllers.utils.ArticlesStreams;
-import com.example.blanche.mynews.models.TopStories;
-import com.example.blanche.mynews.models.TopStoriesMultimedia;
-import com.example.blanche.mynews.models.TopStoriesResult;
+import com.example.blanche.mynews.models.MostPopular;
+import com.example.blanche.mynews.models.MostPopularResult;
+import com.example.blanche.mynews.models.TopStories.TopStories;
+import com.example.blanche.mynews.models.TopStories.TopStoriesMultimedia;
+import com.example.blanche.mynews.models.TopStories.TopStoriesResult;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static android.support.test.espresso.matcher.RootMatchers.withDecorView;
@@ -232,6 +234,73 @@ public class ExampleInstrumentedTest {
                 .assertNoValues();
     }
 
+
+    //------------------------------------
+    //TESTS STREAM THAT FETCH THE MOST POPULAR ARTICLES
+    //-----------------------------------------
+
+    //test that the title of the article is not null
+    @Test
+    public void mostPopularArticleTitleIsNotNullTest() throws Exception {
+        Observable<MostPopular> observable = ArticlesStreams.streamFetchMostPopularArticle(1);
+        TestObserver<MostPopular> testObserver = new TestObserver<>();
+        observable.subscribeWith(testObserver)
+                .assertNoErrors()
+                .assertNoTimeout()
+                .awaitTerminalEvent();
+        MostPopular mostPopular = testObserver.values().get(0);
+        MostPopularResult mostPopularResult = mostPopular.getMostPopularResults().get(0);
+        assertNotNull(mostPopularResult.getTitle());
+    }
+
+    //test that the status of the object retrieved in onNext is OK
+    @Test
+    public void mostPopularStatusIsOkTest() {
+        Observable<MostPopular> observable = ArticlesStreams.streamFetchMostPopularArticle(1);
+        TestObserver<MostPopular> testObserver = new TestObserver<>();
+        observable.subscribeWith(testObserver)
+                .assertNoErrors()
+                .assertNoTimeout()
+                .awaitTerminalEvent();
+        MostPopular mostPopular = testObserver.values().get(0);
+        assertEquals("OK", mostPopular.getStatus());
+    }
+
+    @Test
+    public  void mostPopularWrongParamSentTest() throws Exception {
+        Observable<MostPopular> observable = ArticlesStreams.streamFetchMostPopularArticle("home");
+        TestObserver<MostPopular> testObserver = new TestObserver<>();
+        observable.subscribeWith(testObserver);
+        testObserver.assertNotComplete()
+                .assertNoValues();
+    }
+
+    @Test
+    public void mostPopularArticleUrlIsNotNullTest() throws Exception {
+        Observable<MostPopular> observable = ArticlesStreams.streamFetchMostPopularArticle(1);
+        TestObserver<MostPopular> testObserver = new TestObserver<>();
+        observable.subscribeWith(testObserver)
+                .assertNoErrors()
+                .assertNoTimeout()
+                .awaitTerminalEvent();
+        MostPopular mostPopular = testObserver.values().get(0);
+        MostPopularResult mostPopularResult = mostPopular.getMostPopularResults().get(0);
+        assertNotNull(mostPopularResult.getUrl());
+    }
+
+
+    @Test
+    public void mostPopularArticleSectionIsNotNull() throws Exception {
+        Observable<MostPopular> observable = ArticlesStreams.streamFetchMostPopularArticle(1);
+        TestObserver<MostPopular> testObserver = new TestObserver<>();
+        observable.subscribeWith(testObserver)
+                .assertNoErrors()
+                .assertNoTimeout()
+                .awaitTerminalEvent();
+        MostPopular mostPopular = testObserver.values().get(0);
+        MostPopularResult mostPopularResult = mostPopular.getMostPopularResults().get(0);
+        assertNotNull(mostPopularResult.getSection());
+    }
 
 
 }

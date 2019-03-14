@@ -1,6 +1,6 @@
 package com.example.blanche.mynews.controllers.utils;
 
-import com.example.blanche.mynews.models.TopStories;
+import com.example.blanche.mynews.models.TopStories.TopStories;
 
 import io.reactivex.Observable;
 
@@ -12,6 +12,7 @@ import retrofit2.http.Path;
 
 public interface NyTimesService {
 
+    // TOP STORIES REQUEST
     @GET("{section}.json?api-key=oGSGqG1zng1eifGyyR58BPpegvnm6Ubw")
     Observable<TopStories> getArticleDependingOnSection(@Path("section") String section);
     public static final Retrofit topStoriesRetrofit = new Retrofit.Builder()
@@ -19,5 +20,7 @@ public interface NyTimesService {
             .addConverterFactory(GsonConverterFactory.create())
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .build();
+
+    //MOST POPULAR REQUEST
 
 }

@@ -1,11 +1,10 @@
 package com.example.blanche.mynews.controllers.utils;
 
-import com.example.blanche.mynews.models.TopStories;
+import com.example.blanche.mynews.models.TopStories.TopStories;
 
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
-import io.reactivex.Scheduler;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 

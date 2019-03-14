@@ -5,25 +5,20 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class TopStories {
+public class MostPopular {
+
     @SerializedName("status")
     @Expose
     private String status;
     @SerializedName("copyright")
     @Expose
     private String copyright;
-    @SerializedName("section")
-    @Expose
-    private String section;
-    @SerializedName("last_updated")
-    @Expose
-    private String lastUpdated;
     @SerializedName("num_results")
     @Expose
     private Integer numResults;
     @SerializedName("results")
     @Expose
-    private List<TopStoriesResult> results = null;
+    private List<MostPopularResult> results = null;
 
     public String getStatus() {
         return status;
@@ -41,22 +36,6 @@ public class TopStories {
         this.copyright = copyright;
     }
 
-    public String getSection() {
-        return section;
-    }
-
-    public void setSection(String section) {
-        this.section = section;
-    }
-
-    public String getLastUpdated() {
-        return lastUpdated;
-    }
-
-    public void setLastUpdated(String lastUpdated) {
-        this.lastUpdated = lastUpdated;
-    }
-
     public Integer getNumResults() {
         return numResults;
     }
@@ -65,11 +44,11 @@ public class TopStories {
         this.numResults = numResults;
     }
 
-    public List<TopStoriesResult> getResults() {
+    public List<MostPopularResult> getMostPopularResults() {
         return results;
     }
 
-    public void setResults(List<TopStoriesResult> results) {
+    public void setMostPopularResult(List<MostPopularResult> results) {
         this.results = results;
     }
 }

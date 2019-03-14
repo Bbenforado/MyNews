@@ -1,7 +1,5 @@
 package com.example.blanche.mynews.controllers.fragments;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -11,15 +9,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.example.blanche.mynews.R;
 import com.example.blanche.mynews.controllers.adapters.RecyclerViewAdapter;
 import com.example.blanche.mynews.controllers.utils.ArticlesStreams;
-import com.example.blanche.mynews.models.TopStories;
-import com.example.blanche.mynews.models.TopStoriesResult;
+import com.example.blanche.mynews.models.TopStories.TopStories;
+import com.example.blanche.mynews.models.TopStories.TopStoriesResult;
 
-import java.nio.file.attribute.PosixFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,8 +36,7 @@ public class PageFragment extends Fragment {
     private RecyclerViewAdapter adapter;
     private Disposable disposable;
 
-   // private TextView textView;
-
+    //CONSTRUCTOR
     public PageFragment() {
         // Required empty public constructor
     }
@@ -70,8 +65,8 @@ public class PageFragment extends Fragment {
         //TRIES
         ButterKnife.bind(this, result);
         configureRecyclerView();
-        configureSwipeRefreshLayout();
-        executeHttpRequestTopStories();
+        configureSwipeRefreshLayout(position);
+        executeHttpRequest(position);
         return result;
     }
 
@@ -91,11 +86,11 @@ public class PageFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
-    private void configureSwipeRefreshLayout() {
+    private void configureSwipeRefreshLayout(final int position) {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                executeHttpRequestTopStories();
+                executeHttpRequest(position);
             }
         });
     }
@@ -104,6 +99,22 @@ public class PageFragment extends Fragment {
     //----------------------------
     //HTTP REQUEST RETROFIT + REACTIVE X
     //-----------------------------------------
+    public void executeHttpRequest(int position) {
+        switch (position) {
+            case 0:
+                executeHttpRequestTopStories();
+                break;
+            case 1:
+                //executeHttpRequestMostPopular();
+                break;
+            case 2:
+                //executeHttpRequestArts();
+                break;
+                default:
+                    break;
+        }
+    }
+
     public void executeHttpRequestTopStories() {
         this.disposable =
                 ArticlesStreams.streamFetchTopStoriesArticle("home").subscribeWith(new DisposableObserver<TopStories>() {
@@ -142,5 +153,13 @@ public class PageFragment extends Fragment {
         topStoriesResultList.addAll(results);
         adapter.notifyDataSetChanged();
     }
+
+  //  private void updateUIMostPopular(List<MostPopularResult> results) {
+
+   // }
+
+   // private void updateUIArts(List<ArtsResult> results) {
+
+   // }
 
 }

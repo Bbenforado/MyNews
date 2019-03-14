@@ -1,5 +1,6 @@
-package com.example.blanche.mynews.models;
+package com.example.blanche.mynews.models.TopStories;
 
+import com.example.blanche.mynews.models.TopStories.TopStoriesMultimedia;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 

@@ -7,7 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.blanche.mynews.R;
-import com.example.blanche.mynews.models.TopStoriesResult;
+import com.example.blanche.mynews.models.TopStories.TopStoriesResult;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

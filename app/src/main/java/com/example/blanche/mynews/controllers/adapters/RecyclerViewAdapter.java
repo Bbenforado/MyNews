@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.blanche.mynews.R;
-import com.example.blanche.mynews.models.TopStoriesResult;
+import com.example.blanche.mynews.models.TopStories.TopStoriesResult;
 
 import java.util.List;
 
