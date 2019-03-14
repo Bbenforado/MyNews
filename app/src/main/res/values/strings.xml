@@ -20,4 +20,10 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="query_item">Search query term</string>
+
+    <string name="toast_text_missing_keyword">You have to enter at least one key word!</string>
+    <string name="toast_text_checked_category_missing">You have to select at least one category!</string>
+    <string name="toast_text_no_keyword_no_checked_category">You have to enter a keyword and check a category!</string>
 </resources>

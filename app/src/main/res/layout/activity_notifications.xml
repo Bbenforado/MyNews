@@ -22,6 +22,7 @@
         android:layout_marginTop="30dp"/>
 
     <include
+        android:id="@+id/categories"
         layout="@layout/categories"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

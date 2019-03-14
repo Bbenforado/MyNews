@@ -13,7 +13,7 @@
         android:layout_height="wrap_content">
 
         <CheckBox
-            android:id="@+id/ckeckbox1"
+            android:id="@+id/checkbox1"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -21,7 +21,7 @@
             android:buttonTint="@color/blueMarine"/>
 
         <CheckBox
-            android:id="@+id/ckeckbox2"
+            android:id="@+id/checkbox2"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -35,7 +35,7 @@
         android:layout_height="wrap_content">
 
         <CheckBox
-            android:id="@+id/ckeckbox3"
+            android:id="@+id/checkbox3"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -43,7 +43,7 @@
             android:buttonTint="@color/blueMarine"/>
 
         <CheckBox
-            android:id="@+id/ckeckbox4"
+            android:id="@+id/checkbox4"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -57,7 +57,7 @@
         android:layout_height="wrap_content">
 
         <CheckBox
-            android:id="@+id/ckeckbox5"
+            android:id="@+id/checkbox5"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -65,7 +65,7 @@
             android:buttonTint="@color/blueMarine" />
 
         <CheckBox
-            android:id="@+id/ckeckbox6"
+            android:id="@+id/checkbox6"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"

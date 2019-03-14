@@ -6,6 +6,6 @@
     android:id="@+id/edit_text_keywords"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:hint="Search query item"
+    android:hint="@string/query_item"
     android:inputType="text"
     app:backgroundTint="@color/blueMarine" />

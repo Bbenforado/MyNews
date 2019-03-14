@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="176dp"
     android:background="@color/blueMarine"
+    android:id="@+id/drawer_layout"
     android:gravity="center"
     android:orientation="vertical">
 
