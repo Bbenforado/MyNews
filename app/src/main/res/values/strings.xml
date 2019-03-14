@@ -1,13 +1,13 @@
 <resources>
     <string name="app_name">MyNews</string>
-
     <string name="appName">My News</string>
-
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
-    <string name="one">one</string>
-    <string name="two">two</string>
-    <string name="three">three</string>
+
+    <!-- FRAGMENT PAGE -->
+    <string name="one">Top Stories</string>
+    <string name="two">Most Popular</string>
+    <string name="three">Arts</string>
 
     <string-array name="textsFragments">
         <item>@string/one</item>
@@ -15,14 +15,16 @@
         <item>@string/three</item>
     </string-array>
 
-    <string name="aboutText">MyNews is a great application that gives you access to news of all around the world!\nGet informed and enjoy!</string>
-    <string name="aboutText2">Developped by B.Benforado studio</string>
-
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="query_item">Search query term</string>
+    <!-- ABOUT ACTIVITY -->
+    <string name="aboutText">MyNews is a great application that gives you access to news of all around the world!\nGet informed and enjoy!</string>
+    <string name="aboutLittleText">Developped by B.Benforado</string>
 
+
+    <!-- SEARCHING ACTIVITY -->
+    <string name="query_item">Search query term</string>
     <string name="toast_text_missing_keyword">You have to enter at least one key word!</string>
     <string name="toast_text_checked_category_missing">You have to select at least one category!</string>
     <string name="toast_text_no_keyword_no_checked_category">You have to enter a keyword and check a category!</string>

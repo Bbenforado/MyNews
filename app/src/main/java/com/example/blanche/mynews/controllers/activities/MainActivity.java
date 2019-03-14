@@ -67,6 +67,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    //---------------------
+    //CONFIGURATION
+    //----------------------------
+
     private void configureToolbar() {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -108,16 +112,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = menuItem.getItemId();
         switch (id) {
             case R.id.art_category:
+                //launch activity that displays a list of art articles
                 break;
             case R.id.business_category:
+                //launch activity that displays a list of business articles
                 break;
             case R.id.entrepreneurs_category:
+                //launch activity that displays a list of entrepreneurs articles
                 break;
             case R.id.politics_category:
+                //launch activity that displays a list of politics articles
                 break;
             case R.id.sports_category:
+                //launch activity that displays a list of sports articles
                 break;
             case R.id.travel_category:
+                //launch activity that displays a list of travels articles
                 break;
                 default:
                     break;
