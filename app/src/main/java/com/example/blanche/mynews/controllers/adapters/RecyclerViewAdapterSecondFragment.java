@@ -9,17 +9,16 @@ import android.view.ViewGroup;
 
 import com.bumptech.glide.RequestManager;
 import com.example.blanche.mynews.R;
-import com.example.blanche.mynews.models.TopStories.TopStoriesMultimedia;
-import com.example.blanche.mynews.models.TopStories.TopStoriesResult;
+import com.example.blanche.mynews.models.MostPopularResult;
 import java.util.List;
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<ArticleViewHolder> {
+public class RecyclerViewAdapterSecondFragment extends RecyclerView.Adapter<ArticleViewHolder> {
 
-    private List<TopStoriesResult> topStoriesResults;
+    private List<MostPopularResult> mostPopularResults;
     private RequestManager glide;
 
-    public RecyclerViewAdapter(List<TopStoriesResult> topStoriesResults, RequestManager glide) {
-        this.topStoriesResults = topStoriesResults;
+    public RecyclerViewAdapterSecondFragment(List<MostPopularResult> mostPopularResults, RequestManager glide) {
+        this.mostPopularResults = mostPopularResults;
         this.glide = glide;
     }
 
@@ -34,11 +33,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<ArticleViewHolder>
 
     @Override
     public void onBindViewHolder(@NonNull ArticleViewHolder articleViewHolder, int position) {
-        articleViewHolder.updateWithTopStoriesArticle(this.topStoriesResults.get(position), this.glide);
+        articleViewHolder.updateWithMostPopularArticle(this.mostPopularResults.get(position), this.glide);
     }
 
     @Override
     public int getItemCount() {
-        return topStoriesResults.size();
+        return mostPopularResults.size();
     }
 }

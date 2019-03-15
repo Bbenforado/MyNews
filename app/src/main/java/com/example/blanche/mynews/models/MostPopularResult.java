@@ -57,9 +57,9 @@ public class MostPopularResult {
     //  @SerializedName("geo_facet")
     // @Expose
     // private String geoFacet;
-    // @SerializedName("media")
-    //  @Expose
-    //   private List<MostPopularResult.MostPopularMediaMetadatum> media = null;
+    @SerializedName("media")
+    @Expose
+    private List<MostPopularMedia> media = null;
     @SerializedName("uri")
     @Expose
     private String uri;
@@ -200,9 +200,9 @@ public class MostPopularResult {
     //     this.geoFacet = geoFacet;
     //  }
 
-    //   public List<MostPopularResult.MostPopularMediaMetadatum> getMedia() {
-    //    return media;
-    // }
+    public List<MostPopularMedia> getMedia() {
+        return media;
+    }
 
     //  public void setMedia(List<MostPopular.Medium> media) {
     //     this.media = media;

@@ -1,5 +1,6 @@
 package com.example.blanche.mynews.controllers.fragments;
 
+
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -13,11 +14,11 @@ import android.view.ViewGroup;
 import com.bumptech.glide.Glide;
 import com.example.blanche.mynews.R;
 import com.example.blanche.mynews.controllers.adapters.RecyclerViewAdapter;
+import com.example.blanche.mynews.controllers.adapters.RecyclerViewAdapterSecondFragment;
 import com.example.blanche.mynews.controllers.utils.ArticlesStreams;
 import com.example.blanche.mynews.models.MostPopular;
 import com.example.blanche.mynews.models.MostPopularResult;
 import com.example.blanche.mynews.models.TopStories.TopStories;
-import com.example.blanche.mynews.models.TopStories.TopStoriesMultimedia;
 import com.example.blanche.mynews.models.TopStories.TopStoriesResult;
 
 import java.util.ArrayList;
@@ -28,46 +29,45 @@ import butterknife.ButterKnife;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 
-public class PageFragment extends Fragment {
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class SecondPageFragment extends Fragment {
 
     public static final String KEY_POSITION = "position";
-    public static final String KEY_TEXT = "text";
 
-    @BindView(R.id.fragment_page_recycler_view) RecyclerView recyclerView;
-    @BindView(R.id.fragment_page_swipe_container) SwipeRefreshLayout swipeRefreshLayout;
+    @BindView(R.id.fragment_second_page_recycler_view) RecyclerView recyclerView;
+    @BindView(R.id.fragment_second_page_swipe_container)
+    SwipeRefreshLayout swipeRefreshLayout;
 
-    private List<TopStoriesResult> topStoriesResultList;
-    private List<TopStoriesMultimedia> topStoriesMultimedia;
     private List<MostPopularResult> mostPopularResultList;
-    private RecyclerViewAdapter adapter;
+    private RecyclerViewAdapterSecondFragment adapter;
     private Disposable disposable;
 
     //CONSTRUCTOR
-    public PageFragment() {
+    public SecondPageFragment() {
         // Required empty public constructor
     }
 
-
-    public static PageFragment newInstance(int position) {
-        PageFragment fragment = new PageFragment();
+    public static SecondPageFragment newInstance(int position) {
+        SecondPageFragment fragment = new SecondPageFragment();
         Bundle args = new Bundle();
         args.putInt(KEY_POSITION, position);
-     //   args.putString(KEY_TEXT, text);
         fragment.setArguments(args);
         return fragment;
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View result = inflater.inflate(R.layout.fragment_page, container, false);
+        View result = inflater.inflate(R.layout.fragment_second_page, container, false);
+
         int position = getArguments().getInt(KEY_POSITION, -1);
-       // String text = getArguments().getString(KEY_TEXT, null);
+
         ButterKnife.bind(this, result);
         configureRecyclerView();
         configureSwipeRefreshLayout();
-        executeHttpRequestTopStories();
+        executeHttpRequestMostPopular();
         return result;
     }
 
@@ -81,8 +81,8 @@ public class PageFragment extends Fragment {
     //CONFIGURATION
     //-------------------------
     private void configureRecyclerView() {
-        this.topStoriesResultList = new ArrayList<>();
-        this.adapter = new RecyclerViewAdapter(this.topStoriesResultList, Glide.with(this));
+        this.mostPopularResultList = new ArrayList<>();
+        this.adapter = new RecyclerViewAdapterSecondFragment(this.mostPopularResultList, Glide.with(this));
         this.recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
@@ -91,51 +91,14 @@ public class PageFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                executeHttpRequestTopStories();
+                executeHttpRequestMostPopular();
             }
         });
     }
 
-
     //----------------------------
     //HTTP REQUEST RETROFIT + REACTIVE X
     //-----------------------------------------
-    public void executeHttpRequest(int position) {
-        switch (position) {
-            case 0:
-                executeHttpRequestTopStories();
-                break;
-            case 1:
-                executeHttpRequestMostPopular();
-                break;
-            case 2:
-                //executeHttpRequestArts();
-                break;
-                default:
-                    break;
-        }
-    }
-
-    public void executeHttpRequestTopStories() {
-        this.disposable =
-                ArticlesStreams.streamFetchTopStoriesArticle("home").subscribeWith(new DisposableObserver<TopStories>() {
-                    @Override
-                    public void onNext(TopStories topStories) {
-                        Log.e("TAG", "on next");
-                        updateUITopStories(topStories.getResults());
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e("TAG", Log.getStackTraceString(e));
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        Log.e("TAG", "on complete");
-                    }
-                });
-    }
 
     public void executeHttpRequestMostPopular() {
         this.disposable =
@@ -169,22 +132,12 @@ public class PageFragment extends Fragment {
     //----------------------
     //UPDATE UI
     //---------------------
-    private void updateUITopStories(List<TopStoriesResult> results) {
+
+    private void updateUIMostPopular(List<MostPopularResult> results) {
         swipeRefreshLayout.setRefreshing(false);
-        topStoriesResultList.clear();
-        topStoriesResultList.addAll(results);
+        mostPopularResultList.clear();
+        mostPopularResultList.addAll(results);
         adapter.notifyDataSetChanged();
     }
-
-     private void updateUIMostPopular(List<MostPopularResult> results) {
-         swipeRefreshLayout.setRefreshing(false);
-         mostPopularResultList.clear();
-         mostPopularResultList.addAll(results);
-         adapter.notifyDataSetChanged();
-    }
-
-   // private void updateUIArts(List<ArtsResult> results) {
-
-   // }
 
 }
