@@ -1,5 +1,9 @@
 package com.example.blanche.mynews.controllers.utils;
 
+import android.content.Context;
+import android.content.Intent;
+
+import com.example.blanche.mynews.models.MostPopular;
 import com.example.blanche.mynews.models.TopStories.TopStories;
 
 import io.reactivex.Observable;
@@ -22,5 +26,11 @@ public interface NyTimesService {
             .build();
 
     //MOST POPULAR REQUEST
-
+    @GET("{period}.json?api-key=Uk6MBw4ODa402XNeA3u2QKHAvJY5FbAY")
+    Observable<MostPopular> getMostPopularArticleDependingOnPeriod(@Path("period") int period);
+    public static final Retrofit mostPopularRetrofit = new Retrofit.Builder()
+            .baseUrl("https://api.nytimes.com/svc/mostpopular/v2/viewed/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .build();
 }

@@ -268,7 +268,7 @@ public class ExampleInstrumentedTest {
 
     @Test
     public  void mostPopularWrongParamSentTest() throws Exception {
-        Observable<MostPopular> observable = ArticlesStreams.streamFetchMostPopularArticle("home");
+        Observable<MostPopular> observable = ArticlesStreams.streamFetchMostPopularArticle(0);
         TestObserver<MostPopular> testObserver = new TestObserver<>();
         observable.subscribeWith(testObserver);
         testObserver.assertNotComplete()
