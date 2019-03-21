@@ -14,9 +14,12 @@ import android.view.ViewGroup;
 import com.bumptech.glide.Glide;
 import com.example.blanche.mynews.R;
 import com.example.blanche.mynews.controllers.adapters.RecyclerViewAdapterSecondFragment;
+import com.example.blanche.mynews.controllers.adapters.RecyclerViewAdapterThirdFragment;
 import com.example.blanche.mynews.controllers.utils.ArticlesStreams;
 import com.example.blanche.mynews.models.MostPopular.MostPopular;
 import com.example.blanche.mynews.models.MostPopular.MostPopularResult;
+import com.example.blanche.mynews.models.SearchArticles.SearchArticle;
+import com.example.blanche.mynews.models.SearchArticles.SearchArticleObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +39,8 @@ public class ThirdPageFragment extends Fragment {
     @BindView(R.id.fragment_third_second_page_recycler_view) RecyclerView recyclerView;
     @BindView(R.id.fragment_third_page_swipe_container) SwipeRefreshLayout swipeRefreshLayout;
 
-    private List<MostPopularResult> mostPopularResultList;
-    private RecyclerViewAdapterSecondFragment adapter;
+    private List<SearchArticle> searchArticleList;
+    private RecyclerViewAdapterThirdFragment adapter;
     private Disposable disposable;
 
     //CONSTRUCTOR
@@ -61,7 +64,7 @@ public class ThirdPageFragment extends Fragment {
         ButterKnife.bind(this, result);
         configureRecyclerView();
         configureSwipeRefreshLayout();
-        executeHttpRequestMostPopular();
+        executeHttpRequestSearchArticle();
         return result;
     }
 
@@ -75,8 +78,8 @@ public class ThirdPageFragment extends Fragment {
     //CONFIGURATION
     //-------------------------
     private void configureRecyclerView() {
-        this.mostPopularResultList = new ArrayList<>();
-        this.adapter = new RecyclerViewAdapterSecondFragment(this.mostPopularResultList, Glide.with(this));
+        this.searchArticleList = new ArrayList<>();
+        this.adapter = new RecyclerViewAdapterThirdFragment(this.searchArticleList, Glide.with(this));
         this.recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
@@ -85,7 +88,7 @@ public class ThirdPageFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                executeHttpRequestMostPopular();
+                executeHttpRequestSearchArticle();
             }
         });
     }
@@ -94,14 +97,15 @@ public class ThirdPageFragment extends Fragment {
     //HTTP REQUEST RETROFIT + REACTIVE X
     //-----------------------------------------
 
-    public void executeHttpRequestMostPopular() {
+    public void executeHttpRequestSearchArticle() {
         this.disposable =
-                ArticlesStreams.streamFetchMostPopularArticle(1).subscribeWith(new DisposableObserver<MostPopular>() {
+                ArticlesStreams.streamFetchSearchedArticle("20190101", "20190320", "arts", "art", "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS")
+                        .subscribeWith(new DisposableObserver<SearchArticleObject>() {
 
                     @Override
-                    public void onNext(MostPopular mostPopular) {
+                    public void onNext(SearchArticleObject searchArticleObject) {
                         Log.e("TAG", "on next");
-                        updateUIMostPopular(mostPopular.getMostPopularResults());
+                       updateUISearchArticle(searchArticleObject.getResponse().getArticles());
                     }
 
                     @Override
@@ -127,10 +131,10 @@ public class ThirdPageFragment extends Fragment {
     //UPDATE UI
     //---------------------
 
-    private void updateUIMostPopular(List<MostPopularResult> results) {
+    private void updateUISearchArticle(List<SearchArticle> results) {
         swipeRefreshLayout.setRefreshing(false);
-        mostPopularResultList.clear();
-        mostPopularResultList.addAll(results);
+        searchArticleList.clear();
+        searchArticleList.addAll(results);
         adapter.notifyDataSetChanged();
     }
 

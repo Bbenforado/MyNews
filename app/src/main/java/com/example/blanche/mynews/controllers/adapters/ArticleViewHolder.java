@@ -7,11 +7,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.manager.RequestManagerRetriever;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.blanche.mynews.R;
 import com.example.blanche.mynews.models.MostPopular.MostPopularMedia;
 import com.example.blanche.mynews.models.MostPopular.MostPopularMediaDatum;
 import com.example.blanche.mynews.models.MostPopular.MostPopularResult;
+import com.example.blanche.mynews.models.SearchArticles.SearchArticle;
+import com.example.blanche.mynews.models.SearchArticles.SearchArticleMultimedium;
 import com.example.blanche.mynews.models.TopStories.TopStoriesMultimedia;
 import com.example.blanche.mynews.models.TopStories.TopStoriesResult;
 import butterknife.BindView;
@@ -54,5 +57,13 @@ class ArticleViewHolder extends RecyclerView.ViewHolder {
         MostPopularMedia mostPopularMedia = result.getMedia().get(0);
         MostPopularMediaDatum imageData = mostPopularMedia.getMediaMetadata().get(0);
         glide.load(imageData.getUrl()).apply(RequestOptions.noTransformation()).into(imageView);
+    }
+
+    public void updateWithSearchedArticle (SearchArticle article, RequestManager glide) {
+        textViewTitle.setText(article.getHeadline().getMain());
+        textViewDate.setText(article.getPubDate().substring(0,10));
+        SearchArticleMultimedium multimedium = article.getMultimedia().get(0);
+        String url = "https://static01.nyt.com/" + multimedium.getUrl();
+        glide.load(url).apply(RequestOptions.noTransformation()).into(imageView);
     }
 }
