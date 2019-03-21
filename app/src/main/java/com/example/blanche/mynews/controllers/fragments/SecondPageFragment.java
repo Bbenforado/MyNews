@@ -1,6 +1,8 @@
 package com.example.blanche.mynews.controllers.fragments;
 
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -10,12 +12,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.blanche.mynews.R;
 import com.example.blanche.mynews.controllers.adapters.RecyclerViewAdapter;
 import com.example.blanche.mynews.controllers.adapters.RecyclerViewAdapterSecondFragment;
 import com.example.blanche.mynews.controllers.utils.ArticlesStreams;
+import com.example.blanche.mynews.controllers.utils.ItemClickSupport;
 import com.example.blanche.mynews.models.MostPopular;
 import com.example.blanche.mynews.models.MostPopularResult;
 import com.example.blanche.mynews.models.TopStories.TopStories;
@@ -68,6 +72,7 @@ public class SecondPageFragment extends Fragment {
         configureRecyclerView();
         configureSwipeRefreshLayout();
         executeHttpRequestMostPopular();
+        configureOnClickRecyclerView();
         return result;
     }
 
@@ -94,6 +99,18 @@ public class SecondPageFragment extends Fragment {
                 executeHttpRequestMostPopular();
             }
         });
+    }
+
+    private void configureOnClickRecyclerView() {
+        ItemClickSupport.addTo(recyclerView, R.layout.fragment_page_item)
+                .setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
+                    @Override
+                    public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+                        MostPopularResult article = adapter.getArticle(position);
+                        //Toast.makeText(getContext(), "You clicked on article " + article.getTitle(), Toast.LENGTH_SHORT).show();
+                        openWebPage(article.getUrl());
+                    }
+                });
     }
 
     //----------------------------
@@ -138,6 +155,15 @@ public class SecondPageFragment extends Fragment {
         mostPopularResultList.clear();
         mostPopularResultList.addAll(results);
         adapter.notifyDataSetChanged();
+    }
+
+    //-----------------------
+    public void openWebPage(String url) {
+        Uri webpage = Uri.parse(url);
+        Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
+        if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+            startActivity(intent);
+        }
     }
 
 }

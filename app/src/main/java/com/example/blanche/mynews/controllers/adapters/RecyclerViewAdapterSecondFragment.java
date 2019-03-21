@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import com.bumptech.glide.RequestManager;
 import com.example.blanche.mynews.R;
 import com.example.blanche.mynews.models.MostPopularResult;
+import com.example.blanche.mynews.models.TopStories.TopStoriesResult;
+
 import java.util.List;
 
 public class RecyclerViewAdapterSecondFragment extends RecyclerView.Adapter<ArticleViewHolder> {
@@ -39,5 +41,9 @@ public class RecyclerViewAdapterSecondFragment extends RecyclerView.Adapter<Arti
     @Override
     public int getItemCount() {
         return mostPopularResults.size();
+    }
+
+    public MostPopularResult getArticle(int position) {
+        return this.mostPopularResults.get(position);
     }
 }

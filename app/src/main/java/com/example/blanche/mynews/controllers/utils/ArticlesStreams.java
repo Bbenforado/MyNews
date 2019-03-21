@@ -11,8 +11,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 
 public class ArticlesStreams {
 
+    public  static NyTimesService nyTimesService = NyTimesService.retrofit.create(NyTimesService.class);
+
     public static Observable<TopStories> streamFetchTopStoriesArticle(String section) {
-        NyTimesService nyTimesService = NyTimesService.topStoriesRetrofit.create(NyTimesService.class);
         return nyTimesService.getArticleDependingOnSection(section)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -20,7 +21,6 @@ public class ArticlesStreams {
     }
 
     public static Observable<MostPopular> streamFetchMostPopularArticle(int period) {
-        NyTimesService nyTimesService = NyTimesService.mostPopularRetrofit.create(NyTimesService.class);
         return nyTimesService.getMostPopularArticleDependingOnPeriod(period)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

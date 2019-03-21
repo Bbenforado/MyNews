@@ -227,7 +227,7 @@ public class ExampleInstrumentedTest {
     //test in progress, must test that if we sent a wrong param, we need to throw an exception
     @Test
     public  void topStoriesWrongParamSentTest() throws Exception {
-        Observable<TopStories> observable = ArticlesStreams.streamFetchTopStoriesArticle("home");
+        Observable<TopStories> observable = ArticlesStreams.streamFetchTopStoriesArticle("cat");
         TestObserver<TopStories> testObserver = new TestObserver<>();
         observable.subscribeWith(testObserver);
         testObserver.assertNotComplete()

@@ -3,7 +3,7 @@
 
     <item
         android:id="@+id/menu_main_search"
-        android:icon="@drawable/ic_search"
+        android:icon="@drawable/ic_search_"
         app:showAsAction="ifRoom"
         android:title="Search"
         android:iconTint="@color/lightWhite">

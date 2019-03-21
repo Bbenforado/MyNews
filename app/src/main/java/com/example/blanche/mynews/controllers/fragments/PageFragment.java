@@ -1,5 +1,7 @@
 package com.example.blanche.mynews.controllers.fragments;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -9,11 +11,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.blanche.mynews.R;
 import com.example.blanche.mynews.controllers.adapters.RecyclerViewAdapter;
 import com.example.blanche.mynews.controllers.utils.ArticlesStreams;
+import com.example.blanche.mynews.controllers.utils.ItemClickSupport;
 import com.example.blanche.mynews.models.MostPopular;
 import com.example.blanche.mynews.models.MostPopularResult;
 import com.example.blanche.mynews.models.TopStories.TopStories;
@@ -31,14 +35,12 @@ import io.reactivex.observers.DisposableObserver;
 public class PageFragment extends Fragment {
 
     public static final String KEY_POSITION = "position";
-    public static final String KEY_TEXT = "text";
 
     @BindView(R.id.fragment_page_recycler_view) RecyclerView recyclerView;
     @BindView(R.id.fragment_page_swipe_container) SwipeRefreshLayout swipeRefreshLayout;
 
     private List<TopStoriesResult> topStoriesResultList;
     private List<TopStoriesMultimedia> topStoriesMultimedia;
-    private List<MostPopularResult> mostPopularResultList;
     private RecyclerViewAdapter adapter;
     private Disposable disposable;
 
@@ -52,7 +54,6 @@ public class PageFragment extends Fragment {
         PageFragment fragment = new PageFragment();
         Bundle args = new Bundle();
         args.putInt(KEY_POSITION, position);
-     //   args.putString(KEY_TEXT, text);
         fragment.setArguments(args);
         return fragment;
     }
@@ -63,11 +64,11 @@ public class PageFragment extends Fragment {
                              Bundle savedInstanceState) {
         View result = inflater.inflate(R.layout.fragment_page, container, false);
         int position = getArguments().getInt(KEY_POSITION, -1);
-       // String text = getArguments().getString(KEY_TEXT, null);
         ButterKnife.bind(this, result);
         configureRecyclerView();
         configureSwipeRefreshLayout();
         executeHttpRequestTopStories();
+        configureOnClickRecyclerView();
         return result;
     }
 
@@ -96,38 +97,33 @@ public class PageFragment extends Fragment {
         });
     }
 
-
+    private void configureOnClickRecyclerView() {
+        ItemClickSupport.addTo(recyclerView, R.layout.fragment_page_item)
+                .setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
+                    @Override
+                    public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+                        TopStoriesResult article = adapter.getArticle(position);
+                        openWebPage(article.getUrl());
+                       // Toast.makeText(getContext(), "You clicked on article " + article.getTitle(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
     //----------------------------
     //HTTP REQUEST RETROFIT + REACTIVE X
     //-----------------------------------------
-    public void executeHttpRequest(int position) {
-        switch (position) {
-            case 0:
-                executeHttpRequestTopStories();
-                break;
-            case 1:
-                executeHttpRequestMostPopular();
-                break;
-            case 2:
-                //executeHttpRequestArts();
-                break;
-                default:
-                    break;
-        }
-    }
 
     public void executeHttpRequestTopStories() {
         this.disposable =
                 ArticlesStreams.streamFetchTopStoriesArticle("home").subscribeWith(new DisposableObserver<TopStories>() {
                     @Override
                     public void onNext(TopStories topStories) {
-                        Log.e("TAG", "on next");
+                        Log.e("TAG", "on nextTop");
                         updateUITopStories(topStories.getResults());
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.e("TAG", Log.getStackTraceString(e));
+                        Log.e("TAG", "erreur");
                     }
 
                     @Override
@@ -136,36 +132,12 @@ public class PageFragment extends Fragment {
                     }
                 });
     }
-
-    public void executeHttpRequestMostPopular() {
-        this.disposable =
-                ArticlesStreams.streamFetchMostPopularArticle(1).subscribeWith(new DisposableObserver<MostPopular>() {
-
-                    @Override
-                    public void onNext(MostPopular mostPopular) {
-                        Log.e("TAG", "on next");
-                        updateUIMostPopular(mostPopular.getMostPopularResults());
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e("TAG", Log.getStackTraceString(e));
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        Log.e("TAG", "on complete");
-                    }
-                });
-    }
-
     //-----------------
     private void disposeWhenDestroy() {
         if(this.disposable != null && !this.disposable.isDisposed()) {
             this.disposable.dispose();
         }
     }
-
     //----------------------
     //UPDATE UI
     //---------------------
@@ -175,16 +147,13 @@ public class PageFragment extends Fragment {
         topStoriesResultList.addAll(results);
         adapter.notifyDataSetChanged();
     }
-
-     private void updateUIMostPopular(List<MostPopularResult> results) {
-         swipeRefreshLayout.setRefreshing(false);
-         mostPopularResultList.clear();
-         mostPopularResultList.addAll(results);
-         adapter.notifyDataSetChanged();
+    //----------------------
+    public void openWebPage(String url) {
+        Uri webpage = Uri.parse(url);
+        Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
+           if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+        startActivity(intent);
+         }
     }
-
-   // private void updateUIArts(List<ArtsResult> results) {
-
-   // }
 
 }

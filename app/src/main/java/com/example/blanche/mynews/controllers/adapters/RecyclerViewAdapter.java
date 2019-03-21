@@ -41,4 +41,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<ArticleViewHolder>
     public int getItemCount() {
         return topStoriesResults.size();
     }
+
+    public TopStoriesResult getArticle(int position) {
+        return this.topStoriesResults.get(position);
+    }
 }

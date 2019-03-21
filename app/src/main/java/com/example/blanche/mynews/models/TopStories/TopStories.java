@@ -72,4 +72,10 @@ public class TopStories {
     public void setResults(List<TopStoriesResult> results) {
         this.results = results;
     }
+
+
+    @Override
+    public String toString() {
+        return status + " ------ " + section;
+    }
 }

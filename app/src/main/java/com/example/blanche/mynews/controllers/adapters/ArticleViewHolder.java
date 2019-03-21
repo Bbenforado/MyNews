@@ -41,8 +41,10 @@ class ArticleViewHolder extends RecyclerView.ViewHolder {
         } else {
             this.textViewSection.setText(result.getSection() + " > " + result.getSubsection());
         }
-        TopStoriesMultimedia topStoriesMultimedia = result.getMultimedia().get(0);
-        glide.load(topStoriesMultimedia.getUrl()).apply(RequestOptions.noTransformation()).into(imageView);
+        if(result.getMultimedia().size() != 0 ) {
+            TopStoriesMultimedia topStoriesMultimedia = result.getMultimedia().get(0);
+            glide.load(topStoriesMultimedia.getUrl()).apply(RequestOptions.noTransformation()).into(imageView);
+        }
     }
 
     public void updateWithMostPopularArticle (MostPopularResult result, RequestManager glide) {

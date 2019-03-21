@@ -14,7 +14,16 @@
         <activity android:name=".controllers.activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
+                <!--
+                     Include the host attribute if you want your app to respond
+                     only to URLs with your app's domain.
+                -->
+                <data android:scheme="https" />
 
+                <category android:name="android.intent.category.DEFAULT" />
+                <!-- The BROWSABLE category is required to get links from web pages. -->
+                <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -34,13 +43,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".controllers.activities.MainActivity" />
         </activity>
-        <activity android:name=".controllers.activities.AboutActivity"
+        <activity
+            android:name=".controllers.activities.AboutActivity"
             android:label="About"
             android:parentActivityName=".controllers.activities.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".controllers.activities.MainActivity"/>
+                android:value=".controllers.activities.MainActivity" />
         </activity>
+        <activity android:name=".controllers.activities.SearchArticlesActivity"></activity>
     </application>
 
 </manifest>

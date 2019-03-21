@@ -64,8 +64,9 @@ public class SearchActivity extends AppCompatActivity {
             Toast.makeText(this, R.string.toast_text_missing_keyword, Toast.LENGTH_SHORT).show();
         } else  if (!checkbox1.isChecked() && !checkbox2.isChecked() && !checkbox3.isChecked() && !checkbox4.isChecked() && !checkbox5.isChecked() && !checkbox6.isChecked()) {
             Toast.makeText(this, R.string.toast_text_checked_category_missing, Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Not implemented yet...", Toast.LENGTH_SHORT).show();
+            //launch activity that displays a list of articles depending on the keywords, dates and category checked
         }
-
-        //Toast.makeText(this, "Not implemented yet...", Toast.LENGTH_SHORT).show();
     }
 }

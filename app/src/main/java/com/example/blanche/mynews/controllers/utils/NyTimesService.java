@@ -16,21 +16,18 @@ import retrofit2.http.Path;
 
 public interface NyTimesService {
 
-    // TOP STORIES REQUEST
-    @GET("{section}.json?api-key=oGSGqG1zng1eifGyyR58BPpegvnm6Ubw")
-    Observable<TopStories> getArticleDependingOnSection(@Path("section") String section);
-    public static final Retrofit topStoriesRetrofit = new Retrofit.Builder()
-            .baseUrl("https://api.nytimes.com/svc/topstories/v2/")
+    Retrofit retrofit = new Retrofit.Builder()
+            .baseUrl("https://api.nytimes.com/svc/")
             .addConverterFactory(GsonConverterFactory.create())
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .build();
 
+    // TOP STORIES REQUEST
+    @GET("topstories/v2/{section}.json?api-key=oGSGqG1zng1eifGyyR58BPpegvnm6Ubw")
+    Observable<TopStories> getArticleDependingOnSection(@Path("section") String section);
+
+
     //MOST POPULAR REQUEST
-    @GET("{period}.json?api-key=Uk6MBw4ODa402XNeA3u2QKHAvJY5FbAY")
+    @GET("mostpopular/v2/viewed/{period}.json?api-key=Uk6MBw4ODa402XNeA3u2QKHAvJY5FbAY")
     Observable<MostPopular> getMostPopularArticleDependingOnPeriod(@Path("period") int period);
-    public static final Retrofit mostPopularRetrofit = new Retrofit.Builder()
-            .baseUrl("https://api.nytimes.com/svc/mostpopular/v2/viewed/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .build();
 }
