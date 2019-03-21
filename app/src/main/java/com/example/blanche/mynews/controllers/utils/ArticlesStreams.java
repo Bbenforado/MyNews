@@ -1,6 +1,6 @@
 package com.example.blanche.mynews.controllers.utils;
 
-import com.example.blanche.mynews.models.MostPopular;
+import com.example.blanche.mynews.models.MostPopular.MostPopular;
 import com.example.blanche.mynews.models.TopStories.TopStories;
 
 import java.util.concurrent.TimeUnit;

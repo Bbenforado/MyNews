@@ -15,8 +15,8 @@ import com.bumptech.glide.Glide;
 import com.example.blanche.mynews.R;
 import com.example.blanche.mynews.controllers.adapters.RecyclerViewAdapterSecondFragment;
 import com.example.blanche.mynews.controllers.utils.ArticlesStreams;
-import com.example.blanche.mynews.models.MostPopular;
-import com.example.blanche.mynews.models.MostPopularResult;
+import com.example.blanche.mynews.models.MostPopular.MostPopular;
+import com.example.blanche.mynews.models.MostPopular.MostPopularResult;
 
 import java.util.ArrayList;
 import java.util.List;

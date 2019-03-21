@@ -1,9 +1,6 @@
 package com.example.blanche.mynews.controllers.utils;
 
-import android.content.Context;
-import android.content.Intent;
-
-import com.example.blanche.mynews.models.MostPopular;
+import com.example.blanche.mynews.models.MostPopular.MostPopular;
 import com.example.blanche.mynews.models.TopStories.TopStories;
 
 import io.reactivex.Observable;

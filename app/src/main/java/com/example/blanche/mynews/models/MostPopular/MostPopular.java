@@ -1,4 +1,4 @@
-package com.example.blanche.mynews.models;
+package com.example.blanche.mynews.models.MostPopular;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

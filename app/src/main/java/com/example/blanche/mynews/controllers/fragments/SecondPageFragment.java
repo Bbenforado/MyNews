@@ -12,18 +12,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.blanche.mynews.R;
-import com.example.blanche.mynews.controllers.adapters.RecyclerViewAdapter;
 import com.example.blanche.mynews.controllers.adapters.RecyclerViewAdapterSecondFragment;
 import com.example.blanche.mynews.controllers.utils.ArticlesStreams;
 import com.example.blanche.mynews.controllers.utils.ItemClickSupport;
-import com.example.blanche.mynews.models.MostPopular;
-import com.example.blanche.mynews.models.MostPopularResult;
-import com.example.blanche.mynews.models.TopStories.TopStories;
-import com.example.blanche.mynews.models.TopStories.TopStoriesResult;
+import com.example.blanche.mynews.models.MostPopular.MostPopular;
+import com.example.blanche.mynews.models.MostPopular.MostPopularResult;
 
 import java.util.ArrayList;
 import java.util.List;

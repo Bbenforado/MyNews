@@ -9,8 +9,7 @@ import android.view.ViewGroup;
 
 import com.bumptech.glide.RequestManager;
 import com.example.blanche.mynews.R;
-import com.example.blanche.mynews.models.MostPopularResult;
-import com.example.blanche.mynews.models.TopStories.TopStoriesResult;
+import com.example.blanche.mynews.models.MostPopular.MostPopularResult;
 
 import java.util.List;
 

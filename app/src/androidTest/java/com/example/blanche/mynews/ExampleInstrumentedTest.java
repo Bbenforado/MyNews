@@ -7,8 +7,12 @@ import android.support.test.runner.AndroidJUnit4;
 import com.example.blanche.mynews.controllers.activities.MainActivity;
 import com.example.blanche.mynews.controllers.activities.SearchActivity;
 import com.example.blanche.mynews.controllers.utils.ArticlesStreams;
-import com.example.blanche.mynews.models.MostPopular;
-import com.example.blanche.mynews.models.MostPopularResult;
+import com.example.blanche.mynews.models.MostPopular.MostPopular;
+import com.example.blanche.mynews.models.MostPopular.MostPopularResult;
+import com.example.blanche.mynews.models.SearchArticle;
+import com.example.blanche.mynews.models.SearchArticleMultimedium;
+import com.example.blanche.mynews.models.SearchArticleObject;
+import com.example.blanche.mynews.models.SearchArticleResponse;
 import com.example.blanche.mynews.models.TopStories.TopStories;
 import com.example.blanche.mynews.models.TopStories.TopStoriesMultimedia;
 import com.example.blanche.mynews.models.TopStories.TopStoriesResult;
@@ -302,5 +306,77 @@ public class ExampleInstrumentedTest {
         assertNotNull(mostPopularResult.getSection());
     }
 
+    //-----------------------------
+    //TESTS FOR THE SEARCH STREAM
+    //-------------------------------
+    @Test
+    public void searchArticleStatusIsOkTest() {
+        Observable<SearchArticleObject> observable = ArticlesStreams.streamFetchSearchedArticle("20130102", "20140102", "business", "economic", "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS");
+        TestObserver<SearchArticleObject> testObserver = new TestObserver<>();
+        observable.subscribeWith(testObserver)
+                .assertNoErrors()
+                .assertNoTimeout()
+                .awaitTerminalEvent();
+        SearchArticleObject searchObject = testObserver.values().get(0);
+        assertEquals("OK", searchObject.getStatus());
+    }
+
+    @Test
+    public void searchArticleTitleIsNotNullTest() {
+        Observable<SearchArticleObject> observable = ArticlesStreams.streamFetchSearchedArticle("20130102", "20140102", "business", "economic", "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS");
+        TestObserver<SearchArticleObject> testObserver = new TestObserver<>();
+        observable.subscribeWith(testObserver)
+                .assertNoErrors()
+                .assertNoTimeout()
+                .awaitTerminalEvent();
+        if(testObserver.values().get(0) != null) {
+            SearchArticleObject search = testObserver.values().get(0);
+            SearchArticleResponse response = search.getResponse();
+            SearchArticle article = response.getArticles().get(0);
+            assertNotNull(article.getHeadline().getMain());
+        }
+    }
+
+    @Test
+    public void searchArticleUrlIsNotNullTest() {
+        Observable<SearchArticleObject> observable = ArticlesStreams.streamFetchSearchedArticle("20130102", "20140102", "business", "economic", "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS");
+        TestObserver<SearchArticleObject> testObserver = new TestObserver<>();
+        observable.subscribeWith(testObserver)
+                .assertNoErrors()
+                .assertNoTimeout()
+                .awaitTerminalEvent();
+        if(testObserver.values().get(0) != null) {
+            SearchArticleObject search = testObserver.values().get(0);
+            SearchArticleResponse response = search.getResponse();
+            SearchArticle article = response.getArticles().get(0);
+            assertNotNull(article.getWebUrl());
+        }
+    }
+
+    @Test
+    public void searchArticleMultimediaUrlIsNotNullTest() {
+        Observable<SearchArticleObject> observable = ArticlesStreams.streamFetchSearchedArticle("20130102", "20140102", "business", "economic", "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS");
+        TestObserver<SearchArticleObject> testObserver = new TestObserver<>();
+        observable.subscribeWith(testObserver)
+                .assertNoErrors()
+                .assertNoTimeout()
+                .awaitTerminalEvent();
+        if(testObserver.values().get(0) != null) {
+            SearchArticleObject search = testObserver.values().get(0);
+            SearchArticleResponse response = search.getResponse();
+            SearchArticle article = response.getArticles().get(0);
+            SearchArticleMultimedium media = article.getMultimedia().get(0);
+            assertNotNull(media.getUrl());
+        }
+    }
+
+    @Test
+    public void testSearch() throws Exception {
+        Observable<SearchArticleObject> observable = ArticlesStreams.streamFetchSearchedArticle("", "", "business", "economic", "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS");
+        TestObserver<SearchArticleObject> testObserver = new TestObserver<>();
+        observable.subscribeWith(testObserver);
+        testObserver.assertNotComplete()
+                .assertNoValues();
+    }
 
 }
