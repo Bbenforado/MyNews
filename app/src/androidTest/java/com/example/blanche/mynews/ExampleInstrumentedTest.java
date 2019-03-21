@@ -9,10 +9,10 @@ import com.example.blanche.mynews.controllers.activities.SearchActivity;
 import com.example.blanche.mynews.controllers.utils.ArticlesStreams;
 import com.example.blanche.mynews.models.MostPopular.MostPopular;
 import com.example.blanche.mynews.models.MostPopular.MostPopularResult;
-import com.example.blanche.mynews.models.SearchArticle;
-import com.example.blanche.mynews.models.SearchArticleMultimedium;
-import com.example.blanche.mynews.models.SearchArticleObject;
-import com.example.blanche.mynews.models.SearchArticleResponse;
+import com.example.blanche.mynews.models.SearchArticles.SearchArticle;
+import com.example.blanche.mynews.models.SearchArticles.SearchArticleMultimedium;
+import com.example.blanche.mynews.models.SearchArticles.SearchArticleObject;
+import com.example.blanche.mynews.models.SearchArticles.SearchArticleResponse;
 import com.example.blanche.mynews.models.TopStories.TopStories;
 import com.example.blanche.mynews.models.TopStories.TopStoriesMultimedia;
 import com.example.blanche.mynews.models.TopStories.TopStoriesResult;
@@ -310,7 +310,7 @@ public class ExampleInstrumentedTest {
     //TESTS FOR THE SEARCH STREAM
     //-------------------------------
     @Test
-    public void searchArticleStatusIsOkTest() {
+    public void searchArticleStatusIsOkTest() throws Exception {
         Observable<SearchArticleObject> observable = ArticlesStreams.streamFetchSearchedArticle("20130102", "20140102", "business", "economic", "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS");
         TestObserver<SearchArticleObject> testObserver = new TestObserver<>();
         observable.subscribeWith(testObserver)
@@ -322,8 +322,8 @@ public class ExampleInstrumentedTest {
     }
 
     @Test
-    public void searchArticleTitleIsNotNullTest() {
-        Observable<SearchArticleObject> observable = ArticlesStreams.streamFetchSearchedArticle("20130102", "20140102", "business", "economic", "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS");
+    public void searchArticleTitleIsNotNullTest() throws Exception {
+        Observable<SearchArticleObject> observable = ArticlesStreams.streamFetchSearchedArticle("20180102", "20190102", "sports", "football", "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS");
         TestObserver<SearchArticleObject> testObserver = new TestObserver<>();
         observable.subscribeWith(testObserver)
                 .assertNoErrors()
@@ -338,7 +338,7 @@ public class ExampleInstrumentedTest {
     }
 
     @Test
-    public void searchArticleUrlIsNotNullTest() {
+    public void searchArticleUrlIsNotNullTest() throws Exception {
         Observable<SearchArticleObject> observable = ArticlesStreams.streamFetchSearchedArticle("20130102", "20140102", "business", "economic", "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS");
         TestObserver<SearchArticleObject> testObserver = new TestObserver<>();
         observable.subscribeWith(testObserver)
@@ -354,7 +354,7 @@ public class ExampleInstrumentedTest {
     }
 
     @Test
-    public void searchArticleMultimediaUrlIsNotNullTest() {
+    public void searchArticleMultimediaUrlIsNotNullTest() throws Exception {
         Observable<SearchArticleObject> observable = ArticlesStreams.streamFetchSearchedArticle("20130102", "20140102", "business", "economic", "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS");
         TestObserver<SearchArticleObject> testObserver = new TestObserver<>();
         observable.subscribeWith(testObserver)

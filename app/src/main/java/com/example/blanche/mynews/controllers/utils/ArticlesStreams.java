@@ -1,6 +1,7 @@
 package com.example.blanche.mynews.controllers.utils;
 
 import com.example.blanche.mynews.models.MostPopular.MostPopular;
+import com.example.blanche.mynews.models.SearchArticles.SearchArticleObject;
 import com.example.blanche.mynews.models.TopStories.TopStories;
 
 import java.util.concurrent.TimeUnit;
@@ -22,6 +23,21 @@ public class ArticlesStreams {
 
     public static Observable<MostPopular> streamFetchMostPopularArticle(int period) {
         return nyTimesService.getMostPopularArticleDependingOnPeriod(period)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .timeout(10, TimeUnit.SECONDS);
+    }
+
+   // public static Observable<SearchArticleObject> streamFetchSearchedArticle(String beginDate, String endDate, String category, String keyword, String apikey) {
+     //   return nyTimesService.getArticleBySearch(beginDate, endDate, category, keyword, apikey)
+     //           .subscribeOn(Schedulers.io())
+     //           .observeOn(AndroidSchedulers.mainThread())
+     //           .timeout(10, TimeUnit.SECONDS);
+   // }
+
+    public static Observable<SearchArticleObject> streamFetchSearchedArticle(String beginDate, String endDate, String category, String keyword, String apikey) {
+        NyTimesService articleService = NyTimesService.retrofitSearch.create(NyTimesService.class);
+        return articleService.getArticleBySearch(beginDate, endDate, category, keyword, apikey)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .timeout(10, TimeUnit.SECONDS);
