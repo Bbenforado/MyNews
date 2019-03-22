@@ -62,8 +62,11 @@ class ArticleViewHolder extends RecyclerView.ViewHolder {
     public void updateWithSearchedArticle (SearchArticle article, RequestManager glide) {
         textViewTitle.setText(article.getHeadline().getMain());
         textViewDate.setText(article.getPubDate().substring(0,10));
-        SearchArticleMultimedium multimedium = article.getMultimedia().get(0);
-        String url = "https://static01.nyt.com/" + multimedium.getUrl();
-        glide.load(url).apply(RequestOptions.noTransformation()).into(imageView);
+        if(article.getMultimedia().size() != 0) {
+            SearchArticleMultimedium multimedium = article.getMultimedia().get(0);
+            String url = "https://static01.nyt.com/" + multimedium.getUrl();
+            glide.load(url).apply(RequestOptions.noTransformation()).into(imageView);
+        }
     }
+
 }

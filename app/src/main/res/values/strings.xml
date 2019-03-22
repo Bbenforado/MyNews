@@ -28,4 +28,23 @@
     <string name="toast_text_missing_keyword">You have to enter at least one key word!</string>
     <string name="toast_text_checked_category_missing">You have to select at least one category!</string>
     <string name="toast_text_no_keyword_no_checked_category">You have to enter a keyword and check a category!</string>
+
+
+    <!-- NAVIGATION DRAWER -->
+    <string name="arts">arts</string>
+    <string name="business">business</string>
+    <string name="entrepreneurs">entrepreneurs</string>
+    <string name="politics">politics</string>
+    <string name="sports">sports</string>
+    <string name="travel">travel</string>
+
+    <string-array name="categoryList">
+        <item>@string/arts</item>
+        <item>@string/business</item>
+        <item>@string/entrepreneurs</item>
+        <item>@string/politics</item>
+        <item>@string/sports</item>
+        <item>@string/travel</item>
+    </string-array>
+
 </resources>

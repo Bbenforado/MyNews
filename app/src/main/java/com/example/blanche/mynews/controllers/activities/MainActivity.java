@@ -2,14 +2,12 @@ package com.example.blanche.mynews.controllers.activities;
 
 
 import android.content.Intent;
-import android.drm.DrmStore;
-import android.support.annotation.NonNull;
+import android.content.SharedPreferences;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -28,6 +26,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private DrawerLayout drawerLayout;
     private Toolbar toolbar;
     private NavigationView navigationView;
+    private SharedPreferences preferences;
+
+    public static final String KEY_BUTTON = "key_button";
+    public static final String APP_PREFERENCES = "appPreferences";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +40,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         configureViewpagerAndTabs();
         configureNavigationView();
         configureDrawerLayout();
+
+        preferences = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -49,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         switch (menuItem.getItemId()) {
             case R.id.menu_main_search:
                 //on démarre l'activité de search
+
                 Intent searchActivity = new Intent(this, SearchActivity.class);
                 startActivity(searchActivity);
                 return true;
@@ -113,26 +118,44 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         switch (id) {
             case R.id.art_category:
                 //launch activity that displays a list of art articles
+                preferences.edit().putString(KEY_BUTTON, "arts").apply();
+                launchSearchedArticleActivity();
                 break;
             case R.id.business_category:
                 //launch activity that displays a list of business articles
+                preferences.edit().putString(KEY_BUTTON, "business").apply();
+                launchSearchedArticleActivity();
                 break;
             case R.id.entrepreneurs_category:
                 //launch activity that displays a list of entrepreneurs articles
+                preferences.edit().putString(KEY_BUTTON, "entrepreneurs").apply();
+                launchSearchedArticleActivity();
                 break;
             case R.id.politics_category:
                 //launch activity that displays a list of politics articles
+                preferences.edit().putString(KEY_BUTTON, "politics").apply();
+                launchSearchedArticleActivity();
                 break;
             case R.id.sports_category:
                 //launch activity that displays a list of sports articles
+                preferences.edit().putString(KEY_BUTTON, "sports").apply();
+                launchSearchedArticleActivity();
                 break;
             case R.id.travel_category:
                 //launch activity that displays a list of travels articles
+                preferences.edit().putString(KEY_BUTTON, "travel").apply();
+                launchSearchedArticleActivity();
                 break;
                 default:
                     break;
         }
         this.drawerLayout.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    //-----------------
+    private void launchSearchedArticleActivity() {
+        Intent artActivity = new Intent(this, ArticlesByCategoryActivity.class);
+        startActivity(artActivity);
     }
 }

@@ -1,5 +1,7 @@
 package com.example.blanche.mynews.controllers.activities;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -29,6 +31,10 @@ public class SearchActivity extends AppCompatActivity {
     @BindView(R.id.checkbox5) CheckBox checkbox5;
     @BindView(R.id.checkbox6) CheckBox checkbox6;
 
+    public static final String APP_PREFERENCES = "appPreferences";
+    public static final String KEYWORD = "keyword";
+    private SharedPreferences preferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +42,8 @@ public class SearchActivity extends AppCompatActivity {
 
         configureToolbar();
         ButterKnife.bind(this);
+        preferences = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
+
     }
 
     //----------------
@@ -65,8 +73,22 @@ public class SearchActivity extends AppCompatActivity {
         } else  if (!checkbox1.isChecked() && !checkbox2.isChecked() && !checkbox3.isChecked() && !checkbox4.isChecked() && !checkbox5.isChecked() && !checkbox6.isChecked()) {
             Toast.makeText(this, R.string.toast_text_checked_category_missing, Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this, "Not implemented yet...", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Not implemented yet...", Toast.LENGTH_SHORT).show();
             //launch activity that displays a list of articles depending on the keywords, dates and category checked
+            System.out.println("edit text text ===  " + editText.getText().toString());
+            preferences.edit().putString(KEYWORD, editText.getText().toString()).apply();
+            Intent searchArticlesActivity = new Intent(this, SearchArticlesActivity.class);
+            startActivity(searchArticlesActivity);
         }
     }
+
+    private void getCheckedCategory() {
+
+    }
+
+    private void displayToastMessageWhenParamAreMissing() {
+
+    }
+
+
 }

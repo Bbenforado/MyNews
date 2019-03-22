@@ -51,7 +51,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".controllers.activities.MainActivity" />
         </activity>
-        <activity android:name=".controllers.activities.SearchArticlesActivity"></activity>
+        <activity android:name=".controllers.activities.SearchArticlesActivity" />
+        <activity android:name=".controllers.activities.ArticlesByCategoryActivity" />
     </application>
 
 </manifest>

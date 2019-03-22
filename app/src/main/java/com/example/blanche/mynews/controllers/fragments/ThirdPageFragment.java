@@ -99,7 +99,7 @@ public class ThirdPageFragment extends Fragment {
 
     public void executeHttpRequestSearchArticle() {
         this.disposable =
-                ArticlesStreams.streamFetchSearchedArticle("20190101", "20190320", "arts", "art", "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS")
+                ArticlesStreams.streamFetchSearchedArticleByCategory("arts", "newest",  "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS")
                         .subscribeWith(new DisposableObserver<SearchArticleObject>() {
 
                     @Override
