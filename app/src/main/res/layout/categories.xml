@@ -13,7 +13,7 @@
         android:layout_height="wrap_content">
 
         <CheckBox
-            android:id="@+id/checkbox1"
+            android:id="@+id/checkboxArts"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -21,7 +21,7 @@
             android:buttonTint="@color/blueMarine"/>
 
         <CheckBox
-            android:id="@+id/checkbox2"
+            android:id="@+id/checkboxPolitics"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -35,7 +35,7 @@
         android:layout_height="wrap_content">
 
         <CheckBox
-            android:id="@+id/checkbox3"
+            android:id="@+id/checkboxBusiness"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -43,7 +43,7 @@
             android:buttonTint="@color/blueMarine"/>
 
         <CheckBox
-            android:id="@+id/checkbox4"
+            android:id="@+id/checkboxSports"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -57,15 +57,15 @@
         android:layout_height="wrap_content">
 
         <CheckBox
-            android:id="@+id/checkbox5"
+            android:id="@+id/checkboxEntrepreneurs"
             android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Entrepreneurs"
-            android:buttonTint="@color/blueMarine" />
+            android:buttonTint="@color/blueMarine"/>
 
         <CheckBox
-            android:id="@+id/checkbox6"
+            android:id="@+id/checkboxTravel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"

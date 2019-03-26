@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical">
+
+    <ImageView
+        android:layout_width="60sp"
+        android:layout_height="60sp"
+        android:src="@drawable/img_newspaper"
+        android:layout_gravity="center"
+        android:layout_marginTop="20sp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="25sp"
+        android:text="How MyNews works..."
+        android:textColor="@color/blueMarine"
+        android:textStyle="bold"
+        android:layout_weight="1"
+        android:gravity="center"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_weight="0.5">
+
+        <ImageView
+            android:layout_width="50sp"
+            android:layout_height="50sp"
+            android:layout_margin="5dp"
+            android:src="@drawable/ic_search_"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="By clicking here, you can make researches with filters!"
+            android:layout_margin="5dp"
+            android:gravity="center"
+            android:paddingTop="15dp"
+            android:paddingRight="10dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_weight="0.5">
+
+        <ImageView
+            android:layout_width="40sp"
+            android:layout_height="40sp"
+            android:layout_margin="10dp"
+            android:src="@drawable/ic_hamburger_menu"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="The menu button allows you to access to differents categories. You can see articles by clicking on the category you want!"
+            android:layout_margin="5dp"
+            android:gravity="center"
+            android:paddingTop="15dp"
+            android:paddingRight="10dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_weight="0.5">
+
+        <ImageView
+            android:layout_width="40sp"
+            android:layout_height="40sp"
+            android:layout_margin="10dp"
+            android:src="@drawable/ic_menu"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Click on 'notifications' and you can set an alarm once a day to search articles you want depending on fliters you choose!"
+            android:layout_margin="5dp"
+            android:gravity="center"
+            android:paddingTop="15dp"
+            android:paddingRight="10dp"/>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enjoy it!"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:paddingBottom="20dp"
+        android:textColor="@color/blueMarine"/>
+
+</LinearLayout>

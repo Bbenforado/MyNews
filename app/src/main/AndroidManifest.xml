@@ -53,6 +53,7 @@
         </activity>
         <activity android:name=".controllers.activities.SearchArticlesActivity" />
         <activity android:name=".controllers.activities.ArticlesByCategoryActivity" />
+        <activity android:name=".controllers.activities.HelpActivity"></activity>
     </application>
 
 </manifest>

@@ -29,10 +29,8 @@ public class ArticlesByCategoryActivity extends AppCompatActivity {
     private List<SearchArticle> searchArticleList;
     private RecyclerViewAdapterThirdFragment adapter;
     private Disposable disposable;
-    private SharedPreferences preferences;
-
     public static final String KEY_BUTTON = "key_button";
-    public static final String APP_PREFERENCES = "appPreferences";
+    private Bundle bundle;
 
     @BindView(R.id.activity_art_articles_recycler_view) RecyclerView recyclerView;
     @BindView(R.id.activity_art_articles_swipe_container) SwipeRefreshLayout swipeRefreshLayout;
@@ -45,8 +43,8 @@ public class ArticlesByCategoryActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         configureRecyclerView();
         configureSwipeRefreshLayout();
-        preferences = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
-        executeHttpRequest(preferences.getString(KEY_BUTTON, null));
+        bundle = getIntent().getExtras();
+        executeHttpRequest(bundle.getString(KEY_BUTTON));
     }
 
     @Override
@@ -69,7 +67,7 @@ public class ArticlesByCategoryActivity extends AppCompatActivity {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                executeHttpRequest(preferences.getString(KEY_BUTTON, null));
+                executeHttpRequest(bundle.getString(KEY_BUTTON));
             }
         });
     }
@@ -111,7 +109,7 @@ public class ArticlesByCategoryActivity extends AppCompatActivity {
 
     //--------------------
     private void setPreferencesToNull() {
-        preferences.edit().putString(KEY_BUTTON, null).apply();
+        bundle.putString(KEY_BUTTON, null);
     }
 
 

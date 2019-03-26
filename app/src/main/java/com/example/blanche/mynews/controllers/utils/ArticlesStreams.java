@@ -51,4 +51,12 @@ public class ArticlesStreams {
                 .observeOn(AndroidSchedulers.mainThread())
                 .timeout(10, TimeUnit.SECONDS);
     }
+
+    public static Observable<SearchArticleObject> streamFetchSearchedArticleByCategoryAndKeyWord(String keyword, String category, String sort, String apikey) {
+        NyTimesService artArticleService = NyTimesService.retrofitSearchCategory.create(NyTimesService.class);
+        return artArticleService.getArticleBySearchDependingOnCategory(category, sort, apikey)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .timeout(10, TimeUnit.SECONDS);
+    }
 }

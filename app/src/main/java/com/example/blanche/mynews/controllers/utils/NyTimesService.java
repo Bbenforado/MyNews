@@ -61,4 +61,15 @@ public interface NyTimesService {
             .addConverterFactory(GsonConverterFactory.create())
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .build();
+
+    @GET("articlesearch.json?")
+    Observable<SearchArticleObject> getArticleBySearchDependingOnCategoryAndKeyword (@Query("fq") String keyword,
+                                                                           @Query("q") String category,
+                                                                           @Query("sort") String sort,
+                                                                           @Query("api-key") String apikey);
+    public static final Retrofit retrofitSearchCategory = new Retrofit.Builder()
+            .baseUrl("https://api.nytimes.com/svc/search/v2/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .build();
 }
