@@ -30,11 +30,12 @@ public class ExampleUnitTest {
     }
 
     @Test
-    public void dontAddZeroBehindNumber() {
+    public void dontAddZeroBehindSeveralNumbers() {
         SearchActivity searchActivity = new SearchActivity();
         String str = "52";
         str = searchActivity.addZeroToDate(str);
         assertFalse(str.equals("052"));
+        assertTrue(str.equals("52"));
     }
 
     @Test

@@ -6,12 +6,12 @@
         <item name="colorPrimary">@color/blueMarine</item>
         <item name="colorPrimaryDark">@color/blueMarine</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:textColorPrimary">@color/blueMarine</item>
+       <!--<item name="android:textColorPrimary">@color/blueMarine</item>
         <item name="android:textColorSecondary">@color/lightWhite</item>
         <item name="android:textColorPrimaryInverse">@android:color/black</item>
         <item name="android:textColorSecondaryInverse">@color/lightWhite</item>
         <item name="actionMenuTextColor">@color/blueMarine</item>
-        <item name="android:actionMenuTextColor">@color/blueMarine</item>
+        <item name="android:actionMenuTextColor">@color/blueMarine</item> -->
 
     </style>
 

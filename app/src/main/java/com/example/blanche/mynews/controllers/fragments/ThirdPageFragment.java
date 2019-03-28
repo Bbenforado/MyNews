@@ -1,6 +1,7 @@
 package com.example.blanche.mynews.controllers.fragments;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -13,13 +14,16 @@ import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
 import com.example.blanche.mynews.R;
+import com.example.blanche.mynews.controllers.activities.WebviewActivity;
 import com.example.blanche.mynews.controllers.adapters.RecyclerViewAdapterSecondFragment;
 import com.example.blanche.mynews.controllers.adapters.RecyclerViewAdapterThirdFragment;
 import com.example.blanche.mynews.controllers.utils.ArticlesStreams;
+import com.example.blanche.mynews.controllers.utils.ItemClickSupport;
 import com.example.blanche.mynews.models.MostPopular.MostPopular;
 import com.example.blanche.mynews.models.MostPopular.MostPopularResult;
 import com.example.blanche.mynews.models.SearchArticles.SearchArticle;
 import com.example.blanche.mynews.models.SearchArticles.SearchArticleObject;
+import com.example.blanche.mynews.models.TopStories.TopStoriesResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +39,8 @@ import io.reactivex.observers.DisposableObserver;
 public class ThirdPageFragment extends Fragment {
 
     public static final String KEY_POSITION = "position";
+    public static final String KEY_ARTICLE = "key_article";
+    public static final String ARTICLE_TITLE = "article_title";
 
     @BindView(R.id.fragment_third_second_page_recycler_view) RecyclerView recyclerView;
     @BindView(R.id.fragment_third_page_swipe_container) SwipeRefreshLayout swipeRefreshLayout;
@@ -42,6 +48,7 @@ public class ThirdPageFragment extends Fragment {
     private List<SearchArticle> searchArticleList;
     private RecyclerViewAdapterThirdFragment adapter;
     private Disposable disposable;
+    Bundle bundle;
 
     //CONSTRUCTOR
     public ThirdPageFragment() {
@@ -65,6 +72,7 @@ public class ThirdPageFragment extends Fragment {
         configureRecyclerView();
         configureSwipeRefreshLayout();
         executeHttpRequestSearchArticle();
+        configureOnClickRecyclerView();
         return result;
     }
 
@@ -91,6 +99,23 @@ public class ThirdPageFragment extends Fragment {
                 executeHttpRequestSearchArticle();
             }
         });
+    }
+
+    private void configureOnClickRecyclerView() {
+        ItemClickSupport.addTo(recyclerView, R.layout.fragment_page_item)
+                .setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
+                    @Override
+                    public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+                        SearchArticle article = adapter.getArticle(position);
+                        //LAUNCH WEBVIEW ACTIVITY
+                        bundle = new Bundle();
+                        bundle.putString(KEY_ARTICLE, article.getWebUrl());
+                        bundle.putString(ARTICLE_TITLE, article.getHeadline().getMain());
+                        Intent webviewActivity = new Intent(getContext(), WebviewActivity.class);
+                        webviewActivity.putExtras(bundle);
+                        startActivity(webviewActivity);
+                    }
+                });
     }
 
     //----------------------------

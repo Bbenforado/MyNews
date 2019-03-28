@@ -63,8 +63,8 @@ public interface NyTimesService {
             .build();
 
     @GET("articlesearch.json?")
-    Observable<SearchArticleObject> getArticleBySearchDependingOnCategoryAndKeyword (@Query("fq") String keyword,
-                                                                           @Query("q") String category,
+    Observable<SearchArticleObject> getArticleBySearchDependingOnCategoryAndKeyword (@Query("fq") String category,
+                                                                           @Query("q") String keyword,
                                                                            @Query("sort") String sort,
                                                                            @Query("api-key") String apikey);
     public static final Retrofit retrofitSearchCategory = new Retrofit.Builder()

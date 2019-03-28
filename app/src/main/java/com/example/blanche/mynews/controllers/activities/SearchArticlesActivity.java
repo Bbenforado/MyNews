@@ -5,11 +5,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -49,8 +51,9 @@ public class SearchArticlesActivity extends AppCompatActivity {
     public static final String SPORTS = "sports";
     public static final String ENTREPRENEURS = "entrepreneurs";
     public static final String TRAVEL = "travel";
+    public static final String APP_PREFERENCES = "appPreferences";
 
-    Bundle bundle;
+    SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,11 +62,12 @@ public class SearchArticlesActivity extends AppCompatActivity {
 
         ButterKnife.bind(this);
         configureRecyclerView();
-        bundle = getIntent().getExtras();
+        configureToolbar();
+        preferences = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
         String category = getCategories();
-        String keyword = bundle.getString(KEYWORD);
-        String beginDate = bundle.getString(BEGIN_DATE);
-        String endDate = bundle.getString(END_DATE);
+        String keyword = preferences.getString(KEYWORD, null);
+        String beginDate = preferences.getString(BEGIN_DATE, null);
+        String endDate = preferences.getString(END_DATE, null);
 
         executeHttpRequestWithDates(beginDate, endDate, keyword, category);
         configureSwipeRefreshLayout(beginDate, endDate, keyword, category);
@@ -72,6 +76,17 @@ public class SearchArticlesActivity extends AppCompatActivity {
     //----------------------------
     //CONFIGURATION
     //----------------------------
+
+    private void configureToolbar() {
+        Toolbar toolbar = findViewById(R.id.toolbar_search);
+        setSupportActionBar(toolbar);
+        //get a support actionbar corresponding to this toolbar
+        ActionBar actionBar = getSupportActionBar();
+        //enable the up button
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle("Search");
+    }
+
     private void configureRecyclerView() {
         this.searchArticleList = new ArrayList<>();
         this.adapter = new RecyclerViewAdapterThirdFragment(this.searchArticleList, Glide.with(this));
@@ -93,7 +108,7 @@ public class SearchArticlesActivity extends AppCompatActivity {
     //-------------------------
     private void executeHttpRequestWithDates(String beginDate, String endDate, String category, String keyword) {
         this.disposable =
-                ArticlesStreams.streamFetchSearchedArticle(beginDate, endDate,category, keyword,"newest", "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS").subscribeWith(new DisposableObserver<SearchArticleObject>() {
+                ArticlesStreams.streamFetchSearchedArticle(beginDate, endDate, category, keyword,"newest", "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS").subscribeWith(new DisposableObserver<SearchArticleObject>() {
                     @Override
                     public void onNext(SearchArticleObject searchArticleObject) {
                         Log.e("TAG", "on nextTop");
@@ -129,23 +144,23 @@ public class SearchArticlesActivity extends AppCompatActivity {
     //-----------------------
     private String getCategories() {
         StringBuilder stringBuilder = new StringBuilder();
-        if(bundle.getString(ARTS) != null) {
-            stringBuilder.append(" " + '"' + bundle.getString(ARTS) + '"');
+        if (preferences.getString(ARTS, null) != null) {
+            stringBuilder.append(" " +'"' + preferences.getString(ARTS, null) + '"');
         }
-        if(bundle.getString(POLITICS) != null) {
-            stringBuilder.append(" " + '"' + bundle.getString(POLITICS) + '"');
+        if (preferences.getString(POLITICS, null) != null) {
+            stringBuilder.append(" " +'"' + preferences.getString(POLITICS, null) + '"');
         }
-        if(bundle.getString(BUSINESS) != null) {
-            stringBuilder.append(" " + '"' + bundle.getString(BUSINESS) + '"');
+        if (preferences.getString(BUSINESS, null) != null) {
+            stringBuilder.append(" " +'"' + preferences.getString(BUSINESS, null) + '"');
         }
-        if (bundle.getString(SPORTS) != null) {
-            stringBuilder.append(" " + '"' + bundle.getString(SPORTS) + '"');
+        if (preferences.getString(SPORTS, null) != null) {
+            stringBuilder.append(" " +'"' + preferences.getString(SPORTS, null) + '"');
         }
-        if (bundle.getString(ENTREPRENEURS) != null) {
-            stringBuilder.append(" " + '"' + bundle.getString(ENTREPRENEURS) + '"');
+        if (preferences.getString(ENTREPRENEURS, null) != null) {
+            stringBuilder.append(" " +'"' + preferences.getString(ENTREPRENEURS, null) + '"');
         }
-        if (bundle.getString(TRAVEL) != null) {
-            stringBuilder.append(" " + '"' + bundle.getString(TRAVEL) + '"');
+        if (preferences.getString(TRAVEL, null) != null) {
+            stringBuilder.append(" " +'"' + preferences.getString(TRAVEL, null) + '"');
         }
         String categories = stringBuilder.toString();
         return categories;

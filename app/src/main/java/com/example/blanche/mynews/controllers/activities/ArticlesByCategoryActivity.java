@@ -2,10 +2,12 @@ package com.example.blanche.mynews.controllers.activities;
 
 import android.content.SharedPreferences;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
 import com.bumptech.glide.Glide;
@@ -44,6 +46,7 @@ public class ArticlesByCategoryActivity extends AppCompatActivity {
         configureRecyclerView();
         configureSwipeRefreshLayout();
         bundle = getIntent().getExtras();
+        configureToolbar();
         executeHttpRequest(bundle.getString(KEY_BUTTON));
     }
 
@@ -70,6 +73,16 @@ public class ArticlesByCategoryActivity extends AppCompatActivity {
                 executeHttpRequest(bundle.getString(KEY_BUTTON));
             }
         });
+    }
+
+    private void configureToolbar() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        //get a support actionbar corresponding to this toolbar
+        ActionBar actionBar = getSupportActionBar();
+        //enable the up button
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle(bundle.getString(KEY_BUTTON).toUpperCase());
     }
 
     //----------------------

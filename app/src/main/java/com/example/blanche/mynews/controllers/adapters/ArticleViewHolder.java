@@ -47,6 +47,8 @@ class ArticleViewHolder extends RecyclerView.ViewHolder {
         if(result.getMultimedia().size() != 0 ) {
             TopStoriesMultimedia topStoriesMultimedia = result.getMultimedia().get(0);
             glide.load(topStoriesMultimedia.getUrl()).apply(RequestOptions.noTransformation()).into(imageView);
+        } else {
+            imageView.setBackgroundResource(R.drawable.no_image_available);
         }
     }
 
@@ -54,18 +56,26 @@ class ArticleViewHolder extends RecyclerView.ViewHolder {
         textViewTitle.setText(result.getTitle());
         textViewSection.setText(result.getSection());
         textViewDate.setText(result.getPublishedDate());
-        MostPopularMedia mostPopularMedia = result.getMedia().get(0);
-        MostPopularMediaDatum imageData = mostPopularMedia.getMediaMetadata().get(0);
-        glide.load(imageData.getUrl()).apply(RequestOptions.noTransformation()).into(imageView);
+        if (result.getMedia().size() != 0) {
+            MostPopularMedia mostPopularMedia = result.getMedia().get(0);
+            MostPopularMediaDatum imageData = mostPopularMedia.getMediaMetadata().get(0);
+            glide.load(imageData.getUrl()).apply(RequestOptions.noTransformation()).into(imageView);
+        } else {
+            imageView.setBackgroundResource(R.drawable.no_image_available);
+        }
     }
 
     public void updateWithSearchedArticle (SearchArticle article, RequestManager glide) {
         textViewTitle.setText(article.getHeadline().getMain());
-        textViewDate.setText(article.getPubDate().substring(0,10));
+        if(article.getPubDate() != null) {
+            textViewDate.setText(article.getPubDate().substring(0, 10));
+        }
         if(article.getMultimedia().size() != 0) {
             SearchArticleMultimedium multimedium = article.getMultimedia().get(0);
             String url = "https://static01.nyt.com/" + multimedium.getUrl();
             glide.load(url).apply(RequestOptions.noTransformation()).into(imageView);
+        } else {
+            imageView.setBackgroundResource(R.drawable.no_image_available);
         }
     }
 

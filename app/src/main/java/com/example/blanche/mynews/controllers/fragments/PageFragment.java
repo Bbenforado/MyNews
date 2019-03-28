@@ -11,9 +11,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 
 import com.bumptech.glide.Glide;
 import com.example.blanche.mynews.R;
+import com.example.blanche.mynews.controllers.activities.WebviewActivity;
 import com.example.blanche.mynews.controllers.adapters.RecyclerViewAdapter;
 import com.example.blanche.mynews.controllers.utils.ArticlesStreams;
 import com.example.blanche.mynews.controllers.utils.ItemClickSupport;
@@ -32,14 +34,16 @@ import io.reactivex.observers.DisposableObserver;
 public class PageFragment extends Fragment {
 
     public static final String KEY_POSITION = "position";
+    public static final String KEY_ARTICLE = "key_article";
+    public static final String ARTICLE_TITLE = "article_title";
 
     @BindView(R.id.fragment_page_recycler_view) RecyclerView recyclerView;
     @BindView(R.id.fragment_page_swipe_container) SwipeRefreshLayout swipeRefreshLayout;
-
     private List<TopStoriesResult> topStoriesResultList;
     private List<TopStoriesMultimedia> topStoriesMultimedia;
     private RecyclerViewAdapter adapter;
     private Disposable disposable;
+    Bundle bundle;
 
     //CONSTRUCTOR
     public PageFragment() {
@@ -100,8 +104,13 @@ public class PageFragment extends Fragment {
                     @Override
                     public void onItemClicked(RecyclerView recyclerView, int position, View v) {
                         TopStoriesResult article = adapter.getArticle(position);
-                        openWebPage(article.getUrl());
-                       // Toast.makeText(getContext(), "You clicked on article " + article.getTitle(), Toast.LENGTH_SHORT).show();
+                        //LAUNCH WEBVIEW ACTIVITY
+                        bundle = new Bundle();
+                        bundle.putString(KEY_ARTICLE, article.getUrl());
+                        bundle.putString(ARTICLE_TITLE, article.getTitle());
+                        Intent webviewActivity = new Intent(getContext(), WebviewActivity.class);
+                        webviewActivity.putExtras(bundle);
+                        startActivity(webviewActivity);
                     }
                 });
     }
@@ -145,12 +154,6 @@ public class PageFragment extends Fragment {
         adapter.notifyDataSetChanged();
     }
     //----------------------
-    public void openWebPage(String url) {
-        Uri webpage = Uri.parse(url);
-        Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
-           if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
-        startActivity(intent);
-         }
-    }
+
 
 }

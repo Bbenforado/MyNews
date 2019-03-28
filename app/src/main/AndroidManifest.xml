@@ -51,9 +51,27 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".controllers.activities.MainActivity" />
         </activity>
-        <activity android:name=".controllers.activities.SearchArticlesActivity" />
-        <activity android:name=".controllers.activities.ArticlesByCategoryActivity" />
-        <activity android:name=".controllers.activities.HelpActivity"></activity>
+        <activity android:name=".controllers.activities.SearchArticlesActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".controllers.activities.SearchActivity" />
+        </activity>
+        <activity android:name=".controllers.activities.ArticlesByCategoryActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".controllers.activities.MainActivity" />
+        </activity>
+        <activity android:name=".controllers.activities.HelpActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".controllers.activities.MainActivity" />
+        </activity>
+
+        <receiver
+            android:name=".controllers.utils.MyAlarmReceiver"
+            android:exported="true" />
+
+        <activity android:name=".controllers.activities.WebviewActivity"></activity>
     </application>
 
 </manifest>

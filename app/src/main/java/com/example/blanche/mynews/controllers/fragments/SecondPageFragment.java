@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
 import com.example.blanche.mynews.R;
+import com.example.blanche.mynews.controllers.activities.WebviewActivity;
 import com.example.blanche.mynews.controllers.adapters.RecyclerViewAdapterSecondFragment;
 import com.example.blanche.mynews.controllers.utils.ArticlesStreams;
 import com.example.blanche.mynews.controllers.utils.ItemClickSupport;
@@ -43,6 +44,9 @@ public class SecondPageFragment extends Fragment {
     private List<MostPopularResult> mostPopularResultList;
     private RecyclerViewAdapterSecondFragment adapter;
     private Disposable disposable;
+    public static final String KEY_ARTICLE = "key_article";
+    public static final String ARTICLE_TITLE = "article_title";
+    Bundle bundle;
 
     //CONSTRUCTOR
     public SecondPageFragment() {
@@ -103,8 +107,12 @@ public class SecondPageFragment extends Fragment {
                     @Override
                     public void onItemClicked(RecyclerView recyclerView, int position, View v) {
                         MostPopularResult article = adapter.getArticle(position);
-                        //Toast.makeText(getContext(), "You clicked on article " + article.getTitle(), Toast.LENGTH_SHORT).show();
-                        openWebPage(article.getUrl());
+                        bundle = new Bundle();
+                        bundle.putString(KEY_ARTICLE, article.getUrl());
+                        bundle.putString(ARTICLE_TITLE, article.getTitle());
+                        Intent webviewActivity = new Intent(getContext(), WebviewActivity.class);
+                        webviewActivity.putExtras(bundle);
+                        startActivity(webviewActivity);
                     }
                 });
     }
@@ -115,7 +123,7 @@ public class SecondPageFragment extends Fragment {
 
     public void executeHttpRequestMostPopular() {
         this.disposable =
-                ArticlesStreams.streamFetchMostPopularArticle(1).subscribeWith(new DisposableObserver<MostPopular>() {
+                ArticlesStreams.streamFetchMostPopularArticle(7).subscribeWith(new DisposableObserver<MostPopular>() {
 
                     @Override
                     public void onNext(MostPopular mostPopular) {

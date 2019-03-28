@@ -65,7 +65,8 @@ public class SearchActivity extends AppCompatActivity {
     private int day;
     private int month;
     private int year;
-    Bundle bundle;
+    SharedPreferences preferences;
+    public static final String APP_PREFERENCES = "appPreferences";
 
 
     @Override
@@ -75,20 +76,21 @@ public class SearchActivity extends AppCompatActivity {
 
         configureToolbar();
         ButterKnife.bind(this);
-        bundle = new Bundle();
+        preferences = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
+        setCurrentKeyword();
         configureButtons();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        setPreferencesToNull();
+        //setPreferencesToNull();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        setPreferencesToNull();
+        //setPreferencesToNull();
     }
 
     //----------------
@@ -126,7 +128,7 @@ public class SearchActivity extends AppCompatActivity {
             //save the categories selected
             getCheckedCheckboxes();
             //save the keywords selected
-            bundle.putString(KEYWORD, editText.getText().toString());
+            preferences.edit().putString(KEYWORD, editText.getText().toString()).apply();
             launchSearchArticlesActivity();
         }
     }
@@ -160,14 +162,14 @@ public class SearchActivity extends AppCompatActivity {
                             switch (v.getId()) {
                                 case R.id.spinner_button_start_date:
                                     beginDateButton.setText(strDay + "/" + strMonth + "/" + strYear);
-                                    bundle.putString(BEGIN_DATE, strYear + strMonth + strDay);
+                                    preferences.edit().putString(BEGIN_DATE, strYear + strMonth + strDay).apply();
                                     break;
                                 case R.id.spinner_button_end_date:
 
                                     //verifier que la begindate est avant la enddate
 
                                     endDateButton.setText(strDay + "/" + strMonth + "/" + strYear);
-                                    bundle.putString(END_DATE, strYear + strMonth + strDay);
+                                    preferences.edit().putString(END_DATE, strYear + strMonth + strDay).apply();
                                     break;
                                 default:
                                     break;
@@ -204,26 +206,38 @@ public class SearchActivity extends AppCompatActivity {
         return currentDate;
     }
 
-    private void getCheckedCheckboxes() {
+    public void getCheckedCheckboxes() {
         if (checkboxArts.isChecked()) {
-            bundle.putString(ARTS, "arts");
+            preferences.edit().putString(ARTS, "arts").apply();
+        } else {
+            preferences.edit().putString(ARTS, null).apply();
         }
         if (checkboxPolitics.isChecked()) {
-            bundle.putString(POLITICS, "politics");
+            preferences.edit().putString(POLITICS, "politics").apply();
+        }else {
+            preferences.edit().putString(POLITICS, null).apply();
         }
         if (checkboxBusiness.isChecked()) {
-            bundle.putString(BUSINESS, "business");
+            preferences.edit().putString(BUSINESS, "business").apply();
+        }else {
+            preferences.edit().putString(BUSINESS, null).apply();
         }
         if (checkboxSports.isChecked()) {
-            bundle.putString(SPORTS, "sports");
+            preferences.edit().putString(SPORTS, "sports").apply();
+        }else {
+            preferences.edit().putString(SPORTS, null).apply();
         }
         if (checkboxEntrepreneurs.isChecked()) {
-            bundle.putString(ENTREPRENEURS, "entrepreneurs");
+            preferences.edit().putString(ENTREPRENEURS, "entrepreneurs").apply();
+        }else {
+            preferences.edit().putString(ENTREPRENEURS, null).apply();
         }
         if (checkboxTravel.isChecked()) {
-            bundle.putString(TRAVEL, "travel");
+            preferences.edit().putString(TRAVEL, "travel").apply();
+        } else {
+                preferences.edit().putString(TRAVEL, null).apply();
+            }
         }
-    }
 
     public void setDateOnButton(Button button, String date) {
         button.setText(date);
@@ -246,21 +260,26 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void setPreferencesToNull() {
-        bundle.putString(KEYWORD, null);
-        bundle.putString(ARTS, null);
-        bundle.putString(POLITICS, null);
-        bundle.putString(BUSINESS, null);
-        bundle.putString(SPORTS, null);
-        bundle.putString(ENTREPRENEURS, null);
-        bundle.putString(TRAVEL, null);
-        bundle.putString(BEGIN_DATE, null);
-        bundle.putString(END_DATE, null);
+        preferences.edit().putString(KEYWORD, null).apply();
+        preferences.edit().putString(ARTS, null).apply();
+        preferences.edit().putString(POLITICS, null).apply();
+        preferences.edit().putString(BUSINESS, null).apply();
+        preferences.edit().putString(SPORTS, null).apply();
+        preferences.edit().putString(ENTREPRENEURS, null).apply();
+        preferences.edit().putString(TRAVEL, null).apply();
+        preferences.edit().putString(BEGIN_DATE, null).apply();
+        preferences.edit().putString(END_DATE, null).apply();
     }
 
     private void launchSearchArticlesActivity() {
         Intent searchArticlesActivity = new Intent(this, SearchArticlesActivity.class);
-        searchArticlesActivity.putExtras(bundle);
         startActivity(searchArticlesActivity);
+    }
+
+    private void setCurrentKeyword() {
+        if (preferences.getString(KEYWORD, null) != null) {
+            editText.setText(preferences.getString(KEYWORD, null));
+        }
     }
 
 
