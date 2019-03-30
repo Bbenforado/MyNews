@@ -2,6 +2,7 @@ package com.example.blanche.mynews.controllers.activities;
 
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
@@ -25,15 +26,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private DrawerLayout drawerLayout;
     private Toolbar toolbar;
     private NavigationView navigationView;
-    private Bundle bundle;
-
+    Bundle bundle;
+    SharedPreferences preferences;
+    public static final String APP_PREFERENCES = "appPreferences";
     public static final String KEY_BUTTON = "key_button";
+    public static final String KEY_ACTIVITY = "key_activity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        preferences = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
         configureToolbar();
         configureViewpagerAndTabs();
         configureNavigationView();
@@ -49,10 +53,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.menu_main_search:
+                preferences.edit().putInt(KEY_ACTIVITY, 0).apply();
                 launchSearchActivity();
                 return true;
             case R.id.menu_main_notifications:
-                launchNotificationsActivity();
+                //launchNotificationsActivity();
+                preferences.edit().putInt(KEY_ACTIVITY,1).apply();
+                launchSearchActivity();
                 return true;
             case R.id.menu_main_help:
                 launchHelpActivity();
@@ -159,11 +166,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void launchAboutActivity() {
         Intent aboutActivity = new Intent(this, AboutActivity.class);
         startActivity(aboutActivity);
-    }
-
-    private void launchNotificationsActivity() {
-        Intent notificationsActivity = new Intent(this, NotificationsActivity.class);
-        startActivity(notificationsActivity);
     }
 
     private void launchSearchActivity() {

@@ -13,12 +13,14 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.blanche.mynews.R;
 import com.example.blanche.mynews.controllers.adapters.RecyclerViewAdapterThirdFragment;
 import com.example.blanche.mynews.controllers.utils.ArticlesStreams;
+import com.example.blanche.mynews.controllers.utils.ItemClickSupport;
 import com.example.blanche.mynews.models.SearchArticles.SearchArticle;
 import com.example.blanche.mynews.models.SearchArticles.SearchArticleObject;
 import com.example.blanche.mynews.models.SearchArticles.SearchArticleResponse;
@@ -42,17 +44,15 @@ public class SearchArticlesActivity extends AppCompatActivity {
     @BindView(R.id.activity_search_articles_swipe_container)
     SwipeRefreshLayout swipeRefreshLayout;
 
-    public static final String KEYWORD = "keyword";
+    public static final String KEYWORD_SEARCH = "keyword";
     public static final String BEGIN_DATE = "begin_date";
     public static final String END_DATE = "end_date";
-    public static final String ARTS = "arts";
-    public static final String POLITICS = "politics";
-    public static final String BUSINESS = "business";
-    public static final String SPORTS = "sports";
-    public static final String ENTREPRENEURS = "entrepreneurs";
-    public static final String TRAVEL = "travel";
     public static final String APP_PREFERENCES = "appPreferences";
+    public static final String KEY_ARTICLE = "key_article";
+    public static final String ARTICLE_TITLE = "article_title";
+    public static final String CATEGORIES_SEARCH = "categories";
 
+    Bundle bundle;
     SharedPreferences preferences;
 
     @Override
@@ -64,13 +64,15 @@ public class SearchArticlesActivity extends AppCompatActivity {
         configureRecyclerView();
         configureToolbar();
         preferences = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
-        String category = getCategories();
-        String keyword = preferences.getString(KEYWORD, null);
+       // String category = getCategories();
+        String category = preferences.getString(CATEGORIES_SEARCH, null);
+        String keyword = preferences.getString(KEYWORD_SEARCH, null);
         String beginDate = preferences.getString(BEGIN_DATE, null);
         String endDate = preferences.getString(END_DATE, null);
 
         executeHttpRequestWithDates(beginDate, endDate, keyword, category);
         configureSwipeRefreshLayout(beginDate, endDate, keyword, category);
+        configureOnClickRecyclerView();
     }
 
     //----------------------------
@@ -101,6 +103,23 @@ public class SearchArticlesActivity extends AppCompatActivity {
                 executeHttpRequestWithDates(beginDate, endDate, keyword, category);
             }
         });
+    }
+
+    private void configureOnClickRecyclerView() {
+        ItemClickSupport.addTo(recyclerView, R.layout.fragment_page_item)
+                .setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
+                    @Override
+                    public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+                        SearchArticle article = adapter.getArticle(position);
+                        //LAUNCH WEBVIEW ACTIVITY
+                        bundle = new Bundle();
+                        bundle.putString(KEY_ARTICLE, article.getWebUrl());
+                        bundle.putString(ARTICLE_TITLE, article.getHeadline().getMain());
+                        Intent webviewActivity = new Intent(getApplicationContext(), WebviewActivity.class);
+                        webviewActivity.putExtras(bundle);
+                        startActivity(webviewActivity);
+                    }
+                });
     }
 
     //--------------------
@@ -142,30 +161,6 @@ public class SearchArticlesActivity extends AppCompatActivity {
     }
 
     //-----------------------
-    private String getCategories() {
-        StringBuilder stringBuilder = new StringBuilder();
-        if (preferences.getString(ARTS, null) != null) {
-            stringBuilder.append(" " +'"' + preferences.getString(ARTS, null) + '"');
-        }
-        if (preferences.getString(POLITICS, null) != null) {
-            stringBuilder.append(" " +'"' + preferences.getString(POLITICS, null) + '"');
-        }
-        if (preferences.getString(BUSINESS, null) != null) {
-            stringBuilder.append(" " +'"' + preferences.getString(BUSINESS, null) + '"');
-        }
-        if (preferences.getString(SPORTS, null) != null) {
-            stringBuilder.append(" " +'"' + preferences.getString(SPORTS, null) + '"');
-        }
-        if (preferences.getString(ENTREPRENEURS, null) != null) {
-            stringBuilder.append(" " +'"' + preferences.getString(ENTREPRENEURS, null) + '"');
-        }
-        if (preferences.getString(TRAVEL, null) != null) {
-            stringBuilder.append(" " +'"' + preferences.getString(TRAVEL, null) + '"');
-        }
-        String categories = stringBuilder.toString();
-        return categories;
-    }
-
     private void displayAlertDialog() {
         new android.support.v7.app.AlertDialog.Builder(this)
                 .setTitle("No Article found...")

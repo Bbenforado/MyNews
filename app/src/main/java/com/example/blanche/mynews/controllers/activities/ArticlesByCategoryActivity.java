@@ -1,5 +1,6 @@
 package com.example.blanche.mynews.controllers.activities;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -9,11 +10,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
 
 import com.bumptech.glide.Glide;
 import com.example.blanche.mynews.R;
 import com.example.blanche.mynews.controllers.adapters.RecyclerViewAdapterThirdFragment;
 import com.example.blanche.mynews.controllers.utils.ArticlesStreams;
+import com.example.blanche.mynews.controllers.utils.ItemClickSupport;
 import com.example.blanche.mynews.models.SearchArticles.SearchArticle;
 import com.example.blanche.mynews.models.SearchArticles.SearchArticleObject;
 import com.example.blanche.mynews.models.SearchArticles.SearchArticleResponse;
@@ -32,6 +35,8 @@ public class ArticlesByCategoryActivity extends AppCompatActivity {
     private RecyclerViewAdapterThirdFragment adapter;
     private Disposable disposable;
     public static final String KEY_BUTTON = "key_button";
+    public static final String KEY_ARTICLE = "key_article";
+    public static final String ARTICLE_TITLE = "article_title";
     private Bundle bundle;
 
     @BindView(R.id.activity_art_articles_recycler_view) RecyclerView recyclerView;
@@ -48,6 +53,7 @@ public class ArticlesByCategoryActivity extends AppCompatActivity {
         bundle = getIntent().getExtras();
         configureToolbar();
         executeHttpRequest(bundle.getString(KEY_BUTTON));
+        configureOnClickRecyclerView();
     }
 
     @Override
@@ -83,6 +89,23 @@ public class ArticlesByCategoryActivity extends AppCompatActivity {
         //enable the up button
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(bundle.getString(KEY_BUTTON).toUpperCase());
+    }
+
+    private void configureOnClickRecyclerView() {
+        ItemClickSupport.addTo(recyclerView, R.layout.fragment_page_item)
+                .setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
+                    @Override
+                    public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+                        SearchArticle article = adapter.getArticle(position);
+                        //LAUNCH WEBVIEW ACTIVITY
+                        bundle = new Bundle();
+                        bundle.putString(KEY_ARTICLE, article.getWebUrl());
+                        bundle.putString(ARTICLE_TITLE, article.getHeadline().getMain());
+                        Intent webviewActivity = new Intent(getApplicationContext(), WebviewActivity.class);
+                        webviewActivity.putExtras(bundle);
+                        startActivity(webviewActivity);
+                    }
+                });
     }
 
     //----------------------

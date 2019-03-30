@@ -22,6 +22,7 @@
         android:layout_marginTop="30dp"/>
 
     <LinearLayout
+        android:id="@+id/layout_dates"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
@@ -44,6 +45,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/layout_spinners"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -90,5 +92,22 @@
         android:textColor="@color/lightWhite"
         android:background="@color/blueMarine"
         android:textAllCaps="false"/>
+
+    <SurfaceView
+        android:id="@+id/surface_view"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="30dp"/>
+
+    <Switch
+        android:id="@+id/switch_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enable notifications (once per day)"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="30dp"/>
 
 </LinearLayout>
