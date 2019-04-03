@@ -3,17 +3,12 @@ package com.example.blanche.mynews.controllers.utils;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.widget.Toast;
-
 import com.example.blanche.mynews.R;
 import com.example.blanche.mynews.models.SearchArticles.SearchArticleObject;
 import com.example.blanche.mynews.models.SearchArticles.SearchArticleResponse;
-
-import androidx.work.OneTimeWorkRequest;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 import io.reactivex.disposables.Disposable;
@@ -35,10 +30,11 @@ public class GetArticlesWorker extends Worker {
     @Override
     public Result doWork() {
 
-        String data = getInputData().getString(CATEGORIES_WORKER);
-        String keyword = getInputData().getString(KEYWORD_WORKER);
+        String categories = getInputData().getString(CATEGORIES_WORKER);
+        String dataKeyword = getInputData().getString(KEYWORD_WORKER);
+        String keyword = "headline:(\""+ dataKeyword +"\")";
         //do the work here
-        executeHttpRequestSearchArticle(data, keyword);
+        executeHttpRequest(null, null, categories, keyword);
 
         return Result.success();
     }
@@ -55,15 +51,16 @@ public class GetArticlesWorker extends Worker {
             NotificationCompat.Builder notification = new NotificationCompat.Builder(getApplicationContext(), "default")
                     .setContentTitle(title)
                     .setContentText(message)
-                    .setSmallIcon(R.drawable.img_newspaper);
+                    .setSmallIcon(R.drawable.img_newspaper)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
             notificationManager.notify(1, notification.build());
         System.out.println("WE SENT NOTIFICATION NOW");
     }
 
-    public void executeHttpRequestSearchArticle(String category, String keyword) {
+    public void executeHttpRequest(String beginDate, String endDate, String category, String keyword) {
         this.disposable =
-                ArticlesStreams.streamFetchSearchedArticleByCategoryAndKeyWord(category, keyword, "newest", "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS")
+                ArticlesStreams.streamFetchSearchedArticle(beginDate, endDate, category, keyword, "newest", "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS")
                         .subscribeWith(new DisposableObserver<SearchArticleObject>() {
 
                             @Override
@@ -72,12 +69,8 @@ public class GetArticlesWorker extends Worker {
                                 Log.e("TAG", "on next");
                                 SearchArticleResponse searchArticleResponse = searchArticleObject.getResponse();
                                 size = searchArticleResponse.getArticles().size();
-                                String sizeStr = Integer.toString(size);
-                                if (size > 0) {
-                                    sendNotification("Title", "We have found " + sizeStr + " articles for the filters you chose! :)");
-                                } else {
-                                    sendNotification("Title", "No articles found for the filters you chose! :(");
-                                }
+                                System.out.println("size = " + size);
+                                displayTextNotificationDependingOnResults(size);
                             }
 
                             @Override
@@ -90,6 +83,15 @@ public class GetArticlesWorker extends Worker {
                                 Log.e("TAG", "on complete");
                             }
                         });
+    }
+
+    private void displayTextNotificationDependingOnResults(int size) {
+        if (size > 0) {
+            String sizeStr = Integer.toString(size);
+            sendNotification("Good news!", "We have found " + sizeStr + " articles for the filters you chose! :)");
+        } else {
+            sendNotification("Sorry...", "No articles found for the filters you chose! :(");
+        }
     }
 
 

@@ -1,8 +1,11 @@
 package com.example.blanche.mynews.controllers.activities;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
@@ -35,14 +38,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        preferences = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
-        configureToolbar();
-        configureViewpagerAndTabs();
-        configureNavigationView();
-        configureDrawerLayout();
-        bundle = new Bundle();
+        if (isNetworkAvailable()) {
+            setContentView(R.layout.activity_main);
+            preferences = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
+            configureToolbar();
+            configureViewpagerAndTabs();
+            configureNavigationView();
+            configureDrawerLayout();
+            bundle = new Bundle();
+        } else {
+            setContentView(R.layout.layout_no_internet);
+        }
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -58,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return true;
             case R.id.menu_main_notifications:
                 //launchNotificationsActivity();
-                preferences.edit().putInt(KEY_ACTIVITY,1).apply();
+                preferences.edit().putInt(KEY_ACTIVITY, 1).apply();
                 launchSearchActivity();
                 return true;
             case R.id.menu_main_help:
@@ -66,8 +72,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return true;
             case R.id.menu_main_about:
                 launchAboutActivity();
-                default:
-                    return super.onOptionsItemSelected(menuItem);
+            default:
+                return super.onOptionsItemSelected(menuItem);
         }
     }
 
@@ -92,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void configureNavigationView() {
         navigationView = findViewById(R.id.main_activity_nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
     }
 
     private void configureDrawerLayout() {
@@ -103,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onBackPressed() {
-        if(drawerLayout.isDrawerOpen(GravityCompat.START)) {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
@@ -112,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onNavigationItemSelected(MenuItem menuItem) {
+
         int id = menuItem.getItemId();
         switch (id) {
             case R.id.art_category:
@@ -144,18 +152,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 bundle.putString(KEY_BUTTON, "travel");
                 launchSearchedArticleActivity();
                 break;
-                default:
-                    break;
+            default:
+                break;
         }
+        uncheckItemOfNavigationDrawer();
         this.drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
 
     //-----------------
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+
     private void launchSearchedArticleActivity() {
-        Intent artActivity = new Intent(this, ArticlesByCategoryActivity.class);
-        artActivity.putExtras(bundle);
-        startActivity(artActivity);
+        Intent searchArticleActivity = new Intent(this, ArticlesByCategoryActivity.class);
+        searchArticleActivity.putExtras(bundle);
+        startActivity(searchArticleActivity);
     }
 
     private void launchHelpActivity() {
@@ -172,5 +190,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Intent searchActivity = new Intent(this, SearchActivity.class);
         startActivity(searchActivity);
     }
+
+    private void uncheckItemOfNavigationDrawer() {
+        int size = navigationView.getMenu().size();
+        for (int i = 0; i < size; i++) {
+            navigationView.getMenu().getItem(i).setChecked(false);
+        }
+    }
+
 
 }

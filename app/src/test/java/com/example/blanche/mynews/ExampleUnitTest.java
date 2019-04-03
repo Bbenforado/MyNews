@@ -2,7 +2,9 @@ package com.example.blanche.mynews;
 
 import android.widget.Button;
 
+import com.example.blanche.mynews.controllers.activities.ArticlesByCategoryActivity;
 import com.example.blanche.mynews.controllers.activities.SearchActivity;
+import com.example.blanche.mynews.models.SearchArticles.SearchArticle;
 
 import org.junit.Test;
 
@@ -43,6 +45,32 @@ public class ExampleUnitTest {
         SearchActivity searchActivity = new SearchActivity();
         String currentDate = searchActivity.getCurrentDate();
         assertNotNull(currentDate);
+    }
+
+    @Test
+    public void setTheFirstLetterCapital() {
+        ArticlesByCategoryActivity activity = new ArticlesByCategoryActivity();
+        String str = "hello";
+        String newStr = activity.setFirstLetterUppercase(str);
+        assertNotNull(newStr);
+        assertTrue(newStr.equals("Hello"));
+    }
+
+    @Test
+    public void setFirstLetterCapitalWithOneLetterWord() {
+        ArticlesByCategoryActivity activity = new ArticlesByCategoryActivity();
+        String string = "h";
+        String newS = activity.setFirstLetterUppercase(string);
+        assertTrue(newS.equals("H"));
+
+    }
+
+    @Test
+    public void changeDateFormat() {
+        SearchActivity activity = new SearchActivity();
+        String result = activity.changeSavedDateFormat("20190203");
+        assertTrue(result.equals("03/02/2019"));
+        assertNotNull(result);
     }
 
 }

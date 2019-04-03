@@ -33,7 +33,6 @@ public class ArticlesByCategoryActivity extends AppCompatActivity {
 
     private List<SearchArticle> searchArticleList;
     private RecyclerViewAdapterThirdFragment adapter;
-    private Disposable disposable;
     public static final String KEY_BUTTON = "key_button";
     public static final String KEY_ARTICLE = "key_article";
     public static final String ARTICLE_TITLE = "article_title";
@@ -52,7 +51,7 @@ public class ArticlesByCategoryActivity extends AppCompatActivity {
         configureSwipeRefreshLayout();
         bundle = getIntent().getExtras();
         configureToolbar();
-        executeHttpRequest(bundle.getString(KEY_BUTTON));
+        executeHttpRequest(null, null, bundle.getString(KEY_BUTTON), null);
         configureOnClickRecyclerView();
     }
 
@@ -76,7 +75,7 @@ public class ArticlesByCategoryActivity extends AppCompatActivity {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                executeHttpRequest(bundle.getString(KEY_BUTTON));
+                executeHttpRequest(null, null, bundle.getString(KEY_BUTTON), null);
             }
         });
     }
@@ -88,7 +87,7 @@ public class ArticlesByCategoryActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         //enable the up button
         actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle(bundle.getString(KEY_BUTTON).toUpperCase());
+        actionBar.setTitle(setFirstLetterUppercase(bundle.getString(KEY_BUTTON)));
     }
 
     private void configureOnClickRecyclerView() {
@@ -112,25 +111,25 @@ public class ArticlesByCategoryActivity extends AppCompatActivity {
     //HTTP REQUEST RETROFIT & REACTIVE X
     //------------------------------------
 
-    public void executeHttpRequest(String category) {
-        this.disposable =
-                ArticlesStreams.streamFetchSearchedArticleByCategory(category, "newest", "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS").subscribeWith(new DisposableObserver<SearchArticleObject>() {
-                    @Override
-                    public void onNext(SearchArticleObject searchArticleObject) {
-                        Log.e("TAG", "on nextTop");
-                        SearchArticleResponse response = searchArticleObject.getResponse();
-                        updateUIWithArtArticles(response.getArticles());
-                    }
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e("TAG", "erreur");
-                    }
+    private void executeHttpRequest(String beginDate, String endDate, String category, String keyword) {
+        Disposable disposable = ArticlesStreams.streamFetchSearchedArticle(beginDate, endDate, category, keyword, "newest", "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS").subscribeWith(new DisposableObserver<SearchArticleObject>() {
+            @Override
+            public void onNext(SearchArticleObject searchArticleObject) {
+                Log.e("TAG", "on nextTop");
+                SearchArticleResponse response = searchArticleObject.getResponse();
+                updateUIWithArtArticles(response.getArticles());
+            }
 
-                    @Override
-                    public void onComplete() {
-                        Log.e("TAG", "on complete");
-                    }
-                });
+            @Override
+            public void onError(Throwable e) {
+                Log.e("TAG", "erreur");
+            }
+
+            @Override
+            public void onComplete() {
+                Log.e("TAG", "on complete");
+            }
+        });
     }
 
     //-------------------------
@@ -146,6 +145,11 @@ public class ArticlesByCategoryActivity extends AppCompatActivity {
     //--------------------
     private void setPreferencesToNull() {
         bundle.putString(KEY_BUTTON, null);
+    }
+
+    public String setFirstLetterUppercase(String string) {
+        String result = string.substring(0, 1).toUpperCase() + string.substring(1);
+        return result;
     }
 
 

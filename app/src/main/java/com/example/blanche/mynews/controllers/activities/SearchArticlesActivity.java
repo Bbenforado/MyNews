@@ -70,8 +70,15 @@ public class SearchArticlesActivity extends AppCompatActivity {
         String beginDate = preferences.getString(BEGIN_DATE, null);
         String endDate = preferences.getString(END_DATE, null);
 
-        executeHttpRequestWithDates(beginDate, endDate, keyword, category);
-        configureSwipeRefreshLayout(beginDate, endDate, keyword, category);
+        String keywordRequest = "headline:(\""+ keyword +"\")";
+        System.out.println("keyword search = " + keywordRequest );
+        System.out.println("categories search = " + category);
+        //String categories = "news_desk:(\"" + category + "\")";
+        System.out.println("begin date = " + beginDate);
+        System.out.println("end date = " + endDate);
+
+        executeHttpRequestWithDates(beginDate, endDate, category, keywordRequest);
+        configureSwipeRefreshLayout(beginDate, endDate, category, keywordRequest);
         configureOnClickRecyclerView();
     }
 
@@ -133,6 +140,8 @@ public class SearchArticlesActivity extends AppCompatActivity {
                         Log.e("TAG", "on nextTop");
                         SearchArticleResponse response = searchArticleObject.getResponse();
                         updateUIWithArticles(response.getArticles());
+                        int size = response.getArticles().size();
+                        System.out.println("size = " + size);
                         if (response.getArticles().size() == 0) {
                             displayAlertDialog();
                         }

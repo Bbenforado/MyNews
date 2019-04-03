@@ -1,7 +1,5 @@
 package com.example.blanche.mynews.controllers.fragments;
-
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -11,8 +9,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
-
 import com.bumptech.glide.Glide;
 import com.example.blanche.mynews.R;
 import com.example.blanche.mynews.controllers.activities.WebviewActivity;
@@ -22,7 +18,6 @@ import com.example.blanche.mynews.controllers.utils.ItemClickSupport;
 import com.example.blanche.mynews.models.TopStories.TopStories;
 import com.example.blanche.mynews.models.TopStories.TopStoriesMultimedia;
 import com.example.blanche.mynews.models.TopStories.TopStoriesResult;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +45,6 @@ public class PageFragment extends Fragment {
         // Required empty public constructor
     }
 
-
     public static PageFragment newInstance(int position) {
         PageFragment fragment = new PageFragment();
         Bundle args = new Bundle();
@@ -59,18 +53,18 @@ public class PageFragment extends Fragment {
         return fragment;
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View result = inflater.inflate(R.layout.fragment_page, container, false);
-        int position = getArguments().getInt(KEY_POSITION, -1);
-        ButterKnife.bind(this, result);
-        configureRecyclerView();
-        configureSwipeRefreshLayout();
-        executeHttpRequestTopStories();
-        configureOnClickRecyclerView();
-        return result;
+            View result = inflater.inflate(R.layout.fragment_page, container, false);
+            int position = getArguments().getInt(KEY_POSITION, -1);
+            ButterKnife.bind(this, result);
+
+            configureRecyclerView();
+            configureSwipeRefreshLayout();
+            executeHttpRequestTopStories();
+            configureOnClickRecyclerView();
+            return result;
     }
 
     @Override
@@ -154,6 +148,5 @@ public class PageFragment extends Fragment {
         adapter.notifyDataSetChanged();
     }
     //----------------------
-
 
 }

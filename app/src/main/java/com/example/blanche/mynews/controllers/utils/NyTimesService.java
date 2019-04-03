@@ -31,45 +31,18 @@ public interface NyTimesService {
     Observable<MostPopular> getMostPopularArticleDependingOnPeriod(@Path("period") int period);
 
     //SEARCH ARTICLE REQUEST
-  //  @GET("search/v2/articlesearch.json?")
-  //  Observable<SearchArticleObject> getArticleBySearch(@Query("begin_date") String beginDate,
-  //                                                     @Query("end_date") String endDate,
-  //                                                     @Query("fq=news_desk") String category,
-  //                                                     @Query("q") String keyword,
-   //                                                    @Query("api_key") String apikey);
-
     @GET("articlesearch.json?")
     Observable<SearchArticleObject> getArticleBySearch (@Query("begin_date") String beginDate,
                                            @Query("end_date") String endDate,
-                                           @Query("fq") String category,
-                                           @Query("q") String keyword,
+                                           @Query("q") String category,
+                                           @Query("fq") String keyword,
                                            @Query("sort") String sort,
                                            @Query("api-key") String apikey);
-    public static final Retrofit retrofitSearch = new Retrofit.Builder()
+    Retrofit retrofitSearch = new Retrofit.Builder()
             .baseUrl("https://api.nytimes.com/svc/search/v2/")
             .addConverterFactory(GsonConverterFactory.create())
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .build();
 
 
-    @GET("articlesearch.json?")
-    Observable<SearchArticleObject> getArticleBySearchDependingOnCategory (@Query("fq") String category,
-                                                        @Query("sort") String sort,
-                                                        @Query("api-key") String apikey);
-    public static final Retrofit retrofitSearchArt = new Retrofit.Builder()
-            .baseUrl("https://api.nytimes.com/svc/search/v2/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .build();
-
-    @GET("articlesearch.json?")
-    Observable<SearchArticleObject> getArticleBySearchDependingOnCategoryAndKeyword (@Query("fq") String category,
-                                                                           @Query("q") String keyword,
-                                                                           @Query("sort") String sort,
-                                                                           @Query("api-key") String apikey);
-    public static final Retrofit retrofitSearchCategory = new Retrofit.Builder()
-            .baseUrl("https://api.nytimes.com/svc/search/v2/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .build();
 }

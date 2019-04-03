@@ -1,13 +1,13 @@
 package com.example.blanche.mynews.controllers.activities;
 
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.telecom.Call;
 import android.text.TextUtils;
 import android.view.SurfaceView;
 import android.view.View;
@@ -19,21 +19,21 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.Toast;
-
 import com.example.blanche.mynews.R;
 import com.example.blanche.mynews.controllers.utils.GetArticlesWorker;
-import com.example.blanche.mynews.models.SearchArticles.SearchArticle;
 
+import java.text.DateFormat;
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
+import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
-
 import androidx.work.Constraints;
 import androidx.work.Data;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.NetworkType;
-import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 import butterknife.BindView;
@@ -42,6 +42,7 @@ import butterknife.OnClick;
 
 public class SearchActivity extends AppCompatActivity {
 
+    //BINDVIEWS
 
     @BindView(R.id.search_button) Button button;
     @BindView(R.id.spinner_button_start_date) Button beginDateButton;
@@ -61,6 +62,20 @@ public class SearchActivity extends AppCompatActivity {
     public static final String KEY_ACTIVITY = "key_activity";
     public static final String CATEGORIES_SEARCH = "categories";
     public static final String CATEGORIES_NOTIFICATION = "categories_notif";
+    public static final String ARTS = "arts";
+    public static final String POLITICS = "politics";
+    public static final String BUSINESS = "business";
+    public static final String SPORTS = "sports";
+    public static final String ENTREPRENEURS = "entrepreneurs";
+    public static final String TRAVEL = "travel";
+
+    public static final String ARTS_NOTIF = "artsNotif";
+    public static final String POLITICS_NOTIF = "politicsNotif";
+    public static final String BUSINESS_NOTIF = "businessNotif";
+    public static final String SPORTS_NOTIF = "sportsNotif";
+    public static final String ENTREPRENEURS_NOTIF = "entrepreneursNotif";
+    public static final String TRAVEL_NOTIF = "travelNotif";
+
     public static final String KEYWORD_SEARCH = "keyword";
     public static final String KEYWORD_NOTIFICATION = "keyword_notif";
     public static final String BEGIN_DATE = "begin_date";
@@ -69,14 +84,9 @@ public class SearchActivity extends AppCompatActivity {
     private String currentDate;
     ActionBar actionBar;
     SharedPreferences preferences;
-
-
     public static final String SWITCH_BUTTON_STATE = "state";
-    OneTimeWorkRequest request;
     PeriodicWorkRequest periodicRequest;
     Data data;
-    Boolean isMethodDoingThis;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +98,7 @@ public class SearchActivity extends AppCompatActivity {
         displayNotificationOrSearchScreen();
         setCurrentKeyword();
         configureDatesButtons();
+
     }
 
     //----------------
@@ -105,43 +116,52 @@ public class SearchActivity extends AppCompatActivity {
     //SEARCH ACTIVITY
     //---------------------
     private void configureDatesButtons() {
-        currentDate = getCurrentDate();
-        setDateOnButton(beginDateButton, currentDate);
-        setDateOnButton(endDateButton, currentDate);
+        if (preferences.getString(BEGIN_DATE, null) != null) {
+            beginDateButton.setText(changeSavedDateFormat(preferences.getString(BEGIN_DATE, null)));
+        }
+        if (preferences.getString(END_DATE, null) != null) {
+            endDateButton.setText(changeSavedDateFormat(preferences.getString(END_DATE, null)));
+        }
+    }
+
+    public String changeSavedDateFormat(String date) {
+        String year = date.substring(0, 4);
+        String month = date.substring(4, 6);
+        String day = date.substring(6, 8);
+        String result = day + "/" + month + "/" + year;
+        return result;
     }
 
     //NOTIFICATION ACTIVITY
     //-----------------------------
     private void configureSwitchButton() {
-
-        System.out.println("WE ENTER HERE FIRST");
+        displaySwitchButtonState();
 
         switchButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                System.out.println("print bool " + isMethodDoingThis);
-               // if (!isMethodDoingThis) {
-                   // if (!paramsAreMissing()) {
+                if (!paramsAreMissing()) {
 
-                        if (isChecked) {
-                            preferences.edit().putString(KEYWORD_NOTIFICATION, editText.getText().toString()).apply();
-                            preferences.edit().putInt(SWITCH_BUTTON_STATE, 0).apply();
-                            getCheckedCheckboxes();
-                            configureWorkRequest();
-                            //WorkManager.getInstance().enqueue(request);
-                            WorkManager.getInstance().enqueueUniquePeriodicWork("periodic_work", ExistingPeriodicWorkPolicy.REPLACE, periodicRequest);
+                    if (isChecked) {
+                        preferences.edit().putString(KEYWORD_NOTIFICATION, editText.getText().toString()).apply();
+                        preferences.edit().putInt(SWITCH_BUTTON_STATE, 0).apply();
+                        getCheckedCheckboxes();
+                        configureWorkRequest();
+                        WorkManager.getInstance().enqueueUniquePeriodicWork("periodic_work", ExistingPeriodicWorkPolicy.REPLACE, periodicRequest);
 
-                        } else {
-                            //uncheck the boxes, erase the edit text
-                            editText.setText(null);
-                            preferences.edit().putInt(SWITCH_BUTTON_STATE, 1).apply();
-                            System.out.println("here we print the button state = " + preferences.getInt(SWITCH_BUTTON_STATE, -1));
-                            preferences.edit().putString(KEYWORD_NOTIFICATION, null).apply();
-                            preferences.edit().putString(CATEGORIES_NOTIFICATION, null).apply();
-                        }
+                    } else {
+                        //uncheck the boxes, erase the edit text, and stop the periodic job
+                        editText.setText(null);
+                        uncheckCheckBoxes();
+                        preferences.edit().putInt(SWITCH_BUTTON_STATE, 1).apply();
+                        preferences.edit().putString(KEYWORD_NOTIFICATION, null).apply();
+                        preferences.edit().putString(CATEGORIES_NOTIFICATION, null).apply();
+                        WorkManager.getInstance().cancelAllWorkByTag("periodicJob");
                     }
-               // }
-          //  }
+                } else {
+                    Toast.makeText(getApplicationContext(), "You have to enter at least one keyword and check one category!", Toast.LENGTH_SHORT).show();
+                }
+            }
         });
     }
 
@@ -150,22 +170,16 @@ public class SearchActivity extends AppCompatActivity {
                 .putString(GetArticlesWorker.CATEGORIES_WORKER, preferences.getString(CATEGORIES_NOTIFICATION, null))
                 .putString(GetArticlesWorker.KEYWORD_WORKER, preferences.getString(KEYWORD_NOTIFICATION, null))
                 .build();
-
-        //request = new OneTimeWorkRequest.Builder(GetArticlesWorker.class)
-        //        .setInputData(data)
-        //        .build();
         Constraints constraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
-                //.setRequiresDeviceIdle(true)
                 .build();
 
-        periodicRequest = new PeriodicWorkRequest.Builder(GetArticlesWorker.class, 25, TimeUnit.MINUTES)
+        periodicRequest = new PeriodicWorkRequest.Builder(GetArticlesWorker.class, 15, TimeUnit.MINUTES)
+                .addTag("periodicJob")
                 .setConstraints(constraints)
+                .setInputData(data)
                 .build();
-
-
     }
-
 
     //---------------
     //ACTIONS
@@ -175,14 +189,7 @@ public class SearchActivity extends AppCompatActivity {
     //--------------------------------
     @OnClick(R.id.search_button)
     public void submit(View view) {
-        if (!checkboxArts.isChecked() && !checkboxPolitics.isChecked() && !checkboxBusiness.isChecked()
-                && !checkboxSports.isChecked() && !checkboxEntrepreneurs.isChecked() && !checkboxTravel.isChecked() && TextUtils.isEmpty(editText.getText().toString())) {
-            displayToastMessageWhenParamAreMissing(1);
-        } else if (TextUtils.isEmpty(editText.getText().toString())) {
-            displayToastMessageWhenParamAreMissing(2);
-        } else if (!checkboxArts.isChecked() && !checkboxPolitics.isChecked() && !checkboxBusiness.isChecked() && !checkboxSports.isChecked() && !checkboxEntrepreneurs.isChecked() && !checkboxTravel.isChecked()) {
-            displayToastMessageWhenParamAreMissing(3);
-        } else {
+        if (!paramsAreMissing()) {
             //launch activity that displays a list of articles depending on the keywords, dates and category checked
             //save the categories selected
             getCheckedCheckboxes();
@@ -200,6 +207,7 @@ public class SearchActivity extends AppCompatActivity {
 
     //NOTIFICATIONS ACTIVITY
     //-------------------------------------
+
 
 
 
@@ -223,26 +231,11 @@ public class SearchActivity extends AppCompatActivity {
                int currentYear = calendar.get(Calendar.YEAR);
                 //check if selected date is passed or not
                 if(year <= currentYear) {
-                    if(month <= currentMonth) {
+                    if ((month+1) < currentMonth) {
+                        saveDates(v, dayOfMonth, month, year);
+                    } else if ((month+1) == currentMonth) {
                         if (dayOfMonth <= currentDay) {
-                            String strMonth = addZeroToDate(Integer.toString(month+1));
-                            String strDay = addZeroToDate(Integer.toString(dayOfMonth));
-                            String strYear = Integer.toString(year);
-                            switch (v.getId()) {
-                                case R.id.spinner_button_start_date:
-                                    beginDateButton.setText(strDay + "/" + strMonth + "/" + strYear);
-                                    preferences.edit().putString(BEGIN_DATE, strYear + strMonth + strDay).apply();
-                                    break;
-                                case R.id.spinner_button_end_date:
-
-                                    //verifier que la begindate est avant la enddate
-
-                                    endDateButton.setText(strDay + "/" + strMonth + "/" + strYear);
-                                    preferences.edit().putString(END_DATE, strYear + strMonth + strDay).apply();
-                                    break;
-                                default:
-                                    break;
-                            }
+                            saveDates(v, dayOfMonth, month, year);
                         } else {
                             displayWrongDateSelectedMessage(v);
                         }
@@ -254,6 +247,44 @@ public class SearchActivity extends AppCompatActivity {
                 }
             }
         }, year, month, day);
+    }
+
+    private  void saveDates(View v, int dayOfMonth, int month, int year) {
+            String strMonth = addZeroToDate(Integer.toString(month + 1));
+            String strDay = addZeroToDate(Integer.toString(dayOfMonth));
+            String strYear = Integer.toString(year);
+            switch (v.getId()) {
+                case R.id.spinner_button_start_date:
+                    beginDateButton.setText(strDay + "/" + strMonth + "/" + strYear);
+                    preferences.edit().putString(BEGIN_DATE, strYear + strMonth + strDay).apply();
+                    break;
+                case R.id.spinner_button_end_date:
+                        if (isBeginDateBeforeEndDate(dayOfMonth, month, year)) {
+                            endDateButton.setText(strDay + "/" + strMonth + "/" + strYear);
+                            preferences.edit().putString(END_DATE, strYear + strMonth + strDay).apply();
+                        } else {
+                            Toast.makeText(this, "You have to select a date after the begin date...", Toast.LENGTH_SHORT).show();
+                        }
+                    break;
+                default:
+                    break;
+            }
+    }
+
+    private boolean isBeginDateBeforeEndDate(int day, int month, int year) {
+        String dateBegin = beginDateButton.getText().toString();
+        String dateEnd = String.valueOf(day + "/" + (month+1) + "/" + year);
+
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+
+        Date date1 = format.parse(dateBegin,new ParsePosition(0));
+        Date date2 = format.parse(dateEnd, new ParsePosition(0));
+
+        if (date1.compareTo(date2) <= 0){
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private void displayWrongDateSelectedMessage(View v) {
@@ -279,22 +310,6 @@ public class SearchActivity extends AppCompatActivity {
         button.setText(date);
     }
 
-    private void displayToastMessageWhenParamAreMissing(int key) {
-        switch (key) {
-            case 1:
-                Toast.makeText(this, R.string.toast_text_no_keyword_no_checked_category, Toast.LENGTH_SHORT).show();
-                break;
-            case 2:
-                Toast.makeText(this, R.string.toast_text_missing_keyword, Toast.LENGTH_SHORT).show();
-                break;
-            case 3:
-                Toast.makeText(this, R.string.toast_text_checked_category_missing, Toast.LENGTH_SHORT).show();
-                break;
-            default:
-                break;
-        }
-    }
-
     private void launchSearchArticlesActivity() {
         Intent searchArticlesActivity = new Intent(this, SearchArticlesActivity.class);
         startActivity(searchArticlesActivity);
@@ -303,19 +318,15 @@ public class SearchActivity extends AppCompatActivity {
     //FOR NOTIFICATIONS
     //------------------------------------
     private void displaySwitchButtonState() {
-        isMethodDoingThis = true;
-        System.out.println("display swith button state" + isMethodDoingThis);
         if (preferences.getInt(SWITCH_BUTTON_STATE, -1) == 0) {
-            System.out.println("we enter in here if the button state is 0");
             switchButton.setChecked(true);
         } else {
-            System.out.println("or maybe we enter here??");
-            System.out.println("print button state " + preferences.getInt(SWITCH_BUTTON_STATE, -1));
             switchButton.setChecked(false);
         }
-        isMethodDoingThis = false;
-        System.out.println("state button == " + isMethodDoingThis);
     }
+
+    //FOR BOTH
+    //---------------------------------
 
     private boolean paramsAreMissing() {
         if (TextUtils.isEmpty(editText.getText().toString()) && !checkboxArts.isChecked() && !checkboxPolitics.isChecked() && !checkboxBusiness.isChecked()
@@ -323,39 +334,98 @@ public class SearchActivity extends AppCompatActivity {
                 !checkboxArts.isChecked() && !checkboxPolitics.isChecked() && !checkboxBusiness.isChecked()
                         && !checkboxSports.isChecked() && !checkboxEntrepreneurs.isChecked() && !checkboxTravel.isChecked()) {
 
-            System.out.println("WE ENTER HERE");
-
-            Toast.makeText(getApplicationContext(), "You have to enter at least one keyword and check one category!", Toast.LENGTH_SHORT).show();
             switchButton.setChecked(false);
-            //preferences.edit().putString(SWITCH_BUTTON_STATE, 1).apply();
-
+            return true;
+        } else {
+            return false;
         }
-        return true;
-
     }
-
-    //FOR BOTH
-    //---------------------------------
 
     public void getCheckedCheckboxes() {
         StringBuilder stringBuilder = new StringBuilder();
         if (checkboxArts.isChecked()) {
-            stringBuilder.append(" " + '"' + "arts" + '"');
+            stringBuilder.append('"' + "arts" + '"');
+            if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
+                preferences.edit().putString(ARTS, "true").apply();
+            } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
+                preferences.edit().putString(ARTS_NOTIF, "true").apply();
+            }
+        } else {
+            if (preferences.getInt(KEY_ACTIVITY,-1) == 0) {
+                preferences.edit().putString(ARTS, null).apply();
+            } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
+                preferences.edit().putString(ARTS_NOTIF, null).apply();
+            }
         }
         if (checkboxPolitics.isChecked()) {
             stringBuilder.append(" " + '"' + "politics" + '"');
+            if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
+                preferences.edit().putString(POLITICS, "true").apply();
+            } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
+                preferences.edit().putString(POLITICS_NOTIF, "true").apply();
+            }
+        } else {
+            if (preferences.getInt(KEY_ACTIVITY,-1) == 0) {
+                preferences.edit().putString(POLITICS, null).apply();
+            } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
+                preferences.edit().putString(POLITICS_NOTIF, null).apply();
+            }
         }
         if (checkboxBusiness.isChecked()) {
             stringBuilder.append(" " + '"' + "business" + '"');
+            if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
+                preferences.edit().putString(BUSINESS, "true").apply();
+            } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
+                preferences.edit().putString(BUSINESS_NOTIF, "true").apply();
+            }
+        } else {
+            if (preferences.getInt(KEY_ACTIVITY,-1) == 0) {
+                preferences.edit().putString(BUSINESS, null).apply();
+            } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
+                preferences.edit().putString(BUSINESS_NOTIF, null).apply();
+            }
         }
         if (checkboxSports.isChecked()) {
             stringBuilder.append(" " + '"' + "sports" + '"');
+            if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
+                preferences.edit().putString(SPORTS, "true").apply();
+            } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
+                preferences.edit().putString(SPORTS_NOTIF, "true").apply();
+            }
+        } else {
+            if (preferences.getInt(KEY_ACTIVITY,-1) == 0) {
+                preferences.edit().putString(SPORTS, null).apply();
+            } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
+                preferences.edit().putString(SPORTS_NOTIF, null).apply();
+            }
         }
         if (checkboxEntrepreneurs.isChecked()) {
             stringBuilder.append(" " + '"' + "entrepreneurs" + '"');
+            if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
+                preferences.edit().putString(ENTREPRENEURS, "true").apply();
+            } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
+                preferences.edit().putString(ENTREPRENEURS_NOTIF, "true").apply();
+            }
+        } else {
+            if (preferences.getInt(KEY_ACTIVITY,-1) == 0) {
+                preferences.edit().putString(ENTREPRENEURS, null).apply();
+            } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
+                preferences.edit().putString(ENTREPRENEURS_NOTIF, null).apply();
+            }
         }
         if (checkboxTravel.isChecked()) {
             stringBuilder.append(" " + '"' + "travel" + '"');
+            if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
+                preferences.edit().putString(TRAVEL, "true").apply();
+            } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
+                preferences.edit().putString(TRAVEL_NOTIF, "true").apply();
+            }
+        } else {
+            if (preferences.getInt(KEY_ACTIVITY,-1) == 0) {
+                preferences.edit().putString(TRAVEL, null).apply();
+            } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
+                preferences.edit().putString(TRAVEL_NOTIF, null).apply();
+            }
         }
         String categories = stringBuilder.toString();
         //if it s search activity we save it in search preferences
@@ -366,10 +436,6 @@ public class SearchActivity extends AppCompatActivity {
             //if it s notification activity we save it in notifications preferences
             preferences.edit().putString(CATEGORIES_NOTIFICATION, categories).apply();
         }
-    }
-
-    private void setPreferencesToNull() {
-
     }
 
     private void setCurrentKeyword() {
@@ -388,10 +454,73 @@ public class SearchActivity extends AppCompatActivity {
             button.setVisibility(View.GONE);
             actionBar.setTitle("Notifications");
             configureSwitchButton();
+            if (preferences.getInt(SWITCH_BUTTON_STATE, -1) == 0) {
+                setSavedCheckedCategories();
+            }
 
         } else if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
             switchButton.setVisibility(View.GONE);
             surfaceView.setVisibility(View.GONE);
+            setSavedCheckedCategories();
+        }
+    }
+
+    private void uncheckCheckBoxes() {
+        checkboxArts.setChecked(false);
+        checkboxPolitics.setChecked(false);
+        checkboxBusiness.setChecked(false);
+        checkboxSports.setChecked(false);
+        checkboxEntrepreneurs.setChecked(false);
+        checkboxTravel.setChecked(false);
+    }
+
+    private void setSavedCheckedCategories() {
+        if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
+            setCheckedCategoriesForSearchPage();
+        } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
+            setCheckedCategoriesForNotificationPage();
+        }
+    }
+
+    private void setCheckedCategoriesForSearchPage() {
+        if (preferences.getString(ARTS, null) != null) {
+            checkboxArts.setChecked(true);
+        }
+        if (preferences.getString(POLITICS, null) != null) {
+            checkboxPolitics.setChecked(true);
+        }
+        if (preferences.getString(BUSINESS, null) != null) {
+            checkboxBusiness.setChecked(true);
+        }
+        if (preferences.getString(SPORTS, null) != null) {
+            checkboxSports.setChecked(true);
+        }
+        if (preferences.getString(ENTREPRENEURS, null) != null) {
+            checkboxEntrepreneurs.setChecked(true);
+        }
+        if (preferences.getString(TRAVEL, null) != null) {
+            checkboxTravel.setChecked(true);
+        }
+    }
+
+    private void setCheckedCategoriesForNotificationPage() {
+        if (preferences.getString(ARTS_NOTIF, null) != null) {
+            checkboxArts.setChecked(true);
+        }
+        if (preferences.getString(POLITICS_NOTIF, null) != null) {
+            checkboxPolitics.setChecked(true);
+        }
+        if (preferences.getString(BUSINESS_NOTIF, null) != null) {
+            checkboxBusiness.setChecked(true);
+        }
+        if (preferences.getString(SPORTS_NOTIF, null) != null) {
+            checkboxSports.setChecked(true);
+        }
+        if (preferences.getString(ENTREPRENEURS_NOTIF, null) != null) {
+            checkboxEntrepreneurs.setChecked(true);
+        }
+        if (preferences.getString(TRAVEL_NOTIF, null) != null) {
+            checkboxTravel.setChecked(true);
         }
     }
 

@@ -42,21 +42,4 @@ public class ArticlesStreams {
                 .observeOn(AndroidSchedulers.mainThread())
                 .timeout(10, TimeUnit.SECONDS);
     }
-
-
-    public static Observable<SearchArticleObject> streamFetchSearchedArticleByCategory(String category, String sort, String apikey) {
-        NyTimesService artArticleService = NyTimesService.retrofitSearchArt.create(NyTimesService.class);
-        return artArticleService.getArticleBySearchDependingOnCategory(category, sort, apikey)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .timeout(10, TimeUnit.SECONDS);
-    }
-
-    public static Observable<SearchArticleObject> streamFetchSearchedArticleByCategoryAndKeyWord(String category, String keyword, String sort, String apikey) {
-        NyTimesService artArticleService = NyTimesService.retrofitSearchCategory.create(NyTimesService.class);
-        return artArticleService.getArticleBySearchDependingOnCategoryAndKeyword(category, keyword, sort, apikey)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .timeout(10, TimeUnit.SECONDS);
-    }
 }

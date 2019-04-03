@@ -31,7 +31,6 @@ public class WebviewActivity extends AppCompatActivity {
         webView.loadUrl(bundle.getString(KEY_ARTICLE));
     }
 
-
     private void configureToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -40,5 +39,11 @@ public class WebviewActivity extends AppCompatActivity {
         //enable the up button
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(bundle.getString(ARTICLE_TITLE));
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }
