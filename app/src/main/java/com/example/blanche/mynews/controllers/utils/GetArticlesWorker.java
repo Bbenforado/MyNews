@@ -3,6 +3,7 @@ package com.example.blanche.mynews.controllers.utils;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -14,8 +15,13 @@ import androidx.work.WorkerParameters;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 
-public class GetArticlesWorker extends Worker {
+import static android.content.Context.MODE_PRIVATE;
 
+
+public class GetArticlesWorker extends Worker {
+    SharedPreferences preferences;
+    public static final String APP_PREFERENCES = "appPreferences";
+    public static final String IS_THE_FIRST_NOTIFICATION = "notification";
     public static final String CATEGORIES_WORKER = "categories";
     public static final String KEYWORD_WORKER= "keyword";
     Disposable disposable;
@@ -30,12 +36,18 @@ public class GetArticlesWorker extends Worker {
     @Override
     public Result doWork() {
 
+        preferences = getApplicationContext().getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
+        String isTheFirstNotification = preferences.getString(IS_THE_FIRST_NOTIFICATION, null);
+        System.out.println("preference = " + isTheFirstNotification);
         String categories = getInputData().getString(CATEGORIES_WORKER);
         String dataKeyword = getInputData().getString(KEYWORD_WORKER);
         String keyword = "headline:(\""+ dataKeyword +"\")";
         //do the work here
-        executeHttpRequest(null, null, categories, keyword);
-
+        if (isTheFirstNotification.equals("false")) {
+            executeHttpRequest(null, null, categories, keyword);
+        }
+        preferences.edit().putString(IS_THE_FIRST_NOTIFICATION, "false").apply();
+        System.out.println("preference 2 = " + preferences.getString(IS_THE_FIRST_NOTIFICATION, null));
         return Result.success();
     }
 

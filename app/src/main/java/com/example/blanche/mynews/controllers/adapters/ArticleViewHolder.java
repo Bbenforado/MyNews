@@ -48,7 +48,7 @@ class ArticleViewHolder extends RecyclerView.ViewHolder {
             TopStoriesMultimedia topStoriesMultimedia = result.getMultimedia().get(0);
             glide.load(topStoriesMultimedia.getUrl()).apply(RequestOptions.noTransformation()).into(imageView);
         } else {
-            imageView.setBackgroundResource(R.drawable.no_image_available);
+            imageView.setBackgroundResource(R.drawable.ic_no_image_available);
         }
     }
 
@@ -61,7 +61,7 @@ class ArticleViewHolder extends RecyclerView.ViewHolder {
             MostPopularMediaDatum imageData = mostPopularMedia.getMediaMetadata().get(0);
             glide.load(imageData.getUrl()).apply(RequestOptions.noTransformation()).into(imageView);
         } else {
-            imageView.setBackgroundResource(R.drawable.no_image_available);
+            imageView.setBackgroundResource(R.drawable.ic_no_image_available);
         }
     }
 
@@ -75,7 +75,7 @@ class ArticleViewHolder extends RecyclerView.ViewHolder {
             String url = "https://static01.nyt.com/" + multimedium.getUrl();
             glide.load(url).apply(RequestOptions.noTransformation()).into(imageView);
         } else {
-            imageView.setBackgroundResource(R.drawable.no_image_available);
+            imageView.setBackgroundResource(R.drawable.ic_no_image_available);
         }
     }
 

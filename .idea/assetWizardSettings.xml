@@ -33,9 +33,9 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="outputName" value="ic_search_" />
+                                      <entry key="outputName" value="ic_search_toolbar" />
                                       <entry key="theme" value="CUSTOM" />
-                                      <entry key="themeColor" value="d8dfff" />
+                                      <entry key="themeColor" value="e8eaf6" />
                                     </map>
                                   </option>
                                 </PersistentState>

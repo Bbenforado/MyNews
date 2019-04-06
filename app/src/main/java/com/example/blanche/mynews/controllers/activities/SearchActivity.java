@@ -19,16 +19,12 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.Toast;
-import com.example.blanche.mynews.R;
 import com.example.blanche.mynews.controllers.utils.GetArticlesWorker;
-
-import java.text.DateFormat;
+import com.example.blanche.mynews.R;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
-import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 import androidx.work.Constraints;
 import androidx.work.Data;
@@ -87,6 +83,7 @@ public class SearchActivity extends AppCompatActivity {
     public static final String SWITCH_BUTTON_STATE = "state";
     PeriodicWorkRequest periodicRequest;
     Data data;
+    public static final String IS_THE_FIRST_NOTIFICATION = "notification";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,6 +140,7 @@ public class SearchActivity extends AppCompatActivity {
                 if (!paramsAreMissing()) {
 
                     if (isChecked) {
+                        preferences.edit().putString(IS_THE_FIRST_NOTIFICATION, "true").apply();
                         preferences.edit().putString(KEYWORD_NOTIFICATION, editText.getText().toString()).apply();
                         preferences.edit().putInt(SWITCH_BUTTON_STATE, 0).apply();
                         getCheckedCheckboxes();
@@ -230,7 +228,9 @@ public class SearchActivity extends AppCompatActivity {
                int currentMonth = calendar.get(Calendar.MONTH)+1;
                int currentYear = calendar.get(Calendar.YEAR);
                 //check if selected date is passed or not
-                if(year <= currentYear) {
+                if (year< currentYear) {
+                    saveDates(v, dayOfMonth, month, year);
+                } else if(year == currentYear) {
                     if ((month+1) < currentMonth) {
                         saveDates(v, dayOfMonth, month, year);
                     } else if ((month+1) == currentMonth) {
