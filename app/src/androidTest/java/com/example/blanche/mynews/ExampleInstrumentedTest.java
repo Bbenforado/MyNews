@@ -1,11 +1,18 @@
 package com.example.blanche.mynews;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.annotation.UiThreadTest;
+import android.support.test.espresso.ViewAction;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.view.Menu;
+import android.support.transition.Visibility;
+import android.widget.EditText;
 
+import com.example.blanche.mynews.controllers.activities.AboutActivity;
 import com.example.blanche.mynews.controllers.activities.MainActivity;
 import com.example.blanche.mynews.controllers.activities.SearchActivity;
 import com.example.blanche.mynews.controllers.utils.ArticlesStreams;
@@ -18,29 +25,44 @@ import com.example.blanche.mynews.models.SearchArticles.SearchArticleResponse;
 import com.example.blanche.mynews.models.TopStories.TopStories;
 import com.example.blanche.mynews.models.TopStories.TopStoriesMultimedia;
 import com.example.blanche.mynews.models.TopStories.TopStoriesResult;
+
+import static android.content.Context.MODE_PRIVATE;
+import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.clearText;
 import static android.support.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static android.support.test.espresso.action.ViewActions.pressBack;
+import static android.support.test.espresso.action.ViewActions.pressBackUnconditionally;
 import static android.support.test.espresso.matcher.RootMatchers.withDecorView;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.InstrumentationRegistry.getInstrumentation;
-import static android.support.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
-import static android.support.test.espresso.Espresso.pressBack;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
+
 import io.reactivex.Observable;
 import io.reactivex.observers.TestObserver;
+
+import static android.support.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread;
 import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.*;
-
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -50,61 +72,26 @@ import static org.junit.Assert.*;
 @RunWith(AndroidJUnit4.class)
 public class ExampleInstrumentedTest {
 
+    private static final String APP_PREFERENCES = "appPreferences";
+    private static final String KEYWORD_SEARCH = "keyword";
+    private static final String CATEGORIES_SEARCH = "categories";
+    private static final String SWITCH_BUTTON_STATE = "state";
+    private static final String KEYWORD_NOTIFICATION = "keyword_notif";
+    private static final String KEY_ACTIVITY = "key_activity";
+    private static final String CATEGORIES_NOTIFICATION = "categories_notif";
+    private static final String ARTS = "artsNotif";
+    private static final String POLITICS = "politicsNotif";
+    private static final String BUSINESS = "businessNotif";
+    private static final String SPORTS = "sportsNotif";
+    private static final String ENTREPRENEURS = "entrepreneursNotif";
+    private static final String TRAVEL = "travelNotif";
+
     @Test
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
-
         assertEquals("com.example.blanche.mynews", appContext.getPackageName());
     }
-
-    //-------------------
-    //MAIN ACTIVITY   NOT WORKING ANYMORE HAVE TO WORK ON THEM, PROBLEM IS RECYCLER VIEW + VIEW PAGER
-    //-------------------
-
-    @Rule
-    public ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(MainActivity.class);
-
-
-    // check if the search button display the searching activity
- //   @Test
- //   public void launchSearchActivity() {
-        //on récupère le bouton search et on clique dessus
-//        onView(withId(R.id.menu_main_search)).perform(click());
-//        onView(withId(R.id.edit_search)).check(matches(isDisplayed()));
-//        pressBack();
-//        onView(withId(R.id.viewpager)).check(matches(isDisplayed()));
-//    }
-
-    //check if the about button in the toolbar display the about activity
-//    @Test
-//    public void LaunchAboutActivity() {
-//        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
-//        onView(withText("About")).perform(click());
-//        onView(withId(R.id.main_text)).check(matches(isDisplayed()));
-//        pressBack();
-//        onView(withId(R.id.viewpager)).check(matches(isDisplayed()));
-//    }
-
-    //check if the notifications button in the toolbar display the notifications activity
- //   @Test
- //   public void LaunchNotificationsActivity() {
- //       openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
- //       onView(withText("Notifications")).perform(click());
- //       onView(withId(R.id.categories)).check(matches(isDisplayed()));
- //       pressBack();
- //       onView(withId(R.id.viewpager)).check(matches(isDisplayed()));
- //   }
-
-    //check that the navigation drawer opens and closes
- //   @Test
- //   public void openAndCloseTheDrawer() {
- //       onView(withContentDescription(R.string.navigation_drawer_open)).perform(click());
- //       onView(withId(R.id.drawer_layout)).check(matches(isDisplayed()));
- //       pressBack();
- //       onView(withId(R.id.viewpager)).check(matches(isDisplayed()));
- //   }
-
 
     //--------------------
     //SEARCHING ACTIIVITY
@@ -112,43 +99,148 @@ public class ExampleInstrumentedTest {
     @Rule
     public ActivityTestRule<SearchActivity> activityTestRule = new ActivityTestRule<>(SearchActivity.class);
 
-    //check that the user is able to write key words
+    @Mock
+    private SharedPreferences preferences = mock(SharedPreferences.class);
+
+    @Before
+    public void init() throws Throwable {
+        MockitoAnnotations.initMocks(this);
+        Context targetContext = getInstrumentation().getTargetContext();
+        preferences = targetContext.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);
+        setPreferencesToNull();
+    }
+
+    //check if the user is able to write key words
     @Test
     public void userCanTypeTextInSearchingEditText() {
         onView(withId(R.id.edit_search)).perform(typeText("Politics"));
+        onView(withId(R.id.edit_search)).perform(clearText());
     }
 
-    // check if the toast message is displayed if key words are missing
+    // check if the toast message is displayed when key words are missing
     @Test
-    public void validateFormAndKeyWordIsMissing() {
-        onView(allOf(withText("Arts"))).perform(click());
+    public void validateFormAndKeyWordIsMissing() throws Throwable {
+        preferences.edit().putInt(KEY_ACTIVITY, 0).apply();
+        runOnUiThread(new Runnable() {
+            public void run() {
+                activityTestRule.getActivity().displayNotificationOrSearchScreen();
+            }
+        });
+        //we clear
+        onView(withId(R.id.edit_search)).perform(clearText());
+        activityTestRule.getActivity().uncheckCheckBoxes();
+        //check one box
+        onView(withText("Arts")).perform(click());
+        //click the button
         onView(withId(R.id.search_button)).perform(click());
-        //vérifier qu'un toast est affiché
+        //we check if a toast message is displayed
         SearchActivity activity = activityTestRule.getActivity();
-        onView(withText(R.string.toast_text_missing_keyword))
+        onView(withText(R.string.toast_text_no_keyword_no_checked_category))
             .inRoot(withDecorView(not(is(activity.getWindow().getDecorView()))))
             .check(matches(isDisplayed()));
     }
 
-    //check if toast message is displayed if there is no category checked
+    //check if toast message is displayed when there is no category checked
     @Test
-    public void validateFormAndCheckedCategoryIsMissing() {
+    public void validateFormAndCheckedCategoryIsMissing() throws Throwable {
+        preferences.edit().putInt(KEY_ACTIVITY, 0).apply();
+        runOnUiThread(new Runnable() {
+            public void run() {
+                activityTestRule.getActivity().displayNotificationOrSearchScreen();
+            }
+        });
+        //we clear the text and uncheck the boxes
+        onView(withId(R.id.edit_search)).perform(clearText());
+        activityTestRule.getActivity().uncheckCheckBoxes();
+        //we type some words
         onView(withId(R.id.edit_search)).perform(typeText("Turkey"), closeSoftKeyboard());
+        //we click on the search button
         onView(withId(R.id.search_button)).perform(click());
-
-        SearchActivity activity = activityTestRule.getActivity();
-        onView(withText(R.string.toast_text_checked_category_missing))
-                .inRoot(withDecorView(not(is(activity.getWindow().getDecorView()))))
+        //we check if the toast message is displayed
+        onView(withText(R.string.toast_text_no_keyword_no_checked_category))
+                .inRoot(withDecorView(not(is(activityTestRule.getActivity().getWindow().getDecorView()))))
                 .check(matches(isDisplayed()));
     }
 
+    //-------------------------------
+    //DATA SAVING
+    //------------------------------------
+    @Test
+    public void saveDataTest() throws Throwable {
+        preferences.edit().putInt(KEY_ACTIVITY, 0).apply();
+        runOnUiThread(new Runnable() {
+            public void run() {
+                activityTestRule.getActivity().displayNotificationOrSearchScreen();
+            }
+        });
+        //try with one keyword and one category
+        //uncheck the boxes and clear the text
+        onView(withId(R.id.edit_search)).perform(clearText());
+        activityTestRule.getActivity().uncheckCheckBoxes();
+        //type some text and check one box
+        onView(withId(R.id.edit_search)).perform(typeText("Something"), closeSoftKeyboard());
+        onView(withText("Arts")).perform(click());
+
+        activityTestRule.getActivity().saveData();
+
+        assertEquals("Something", preferences.getString(KEYWORD_SEARCH, null));
+        assertEquals('"' + "arts" + '"', preferences.getString(CATEGORIES_SEARCH, null));
+
+        //try with two keywords and two categories
+        setPreferencesToNull();
+        onView(withId(R.id.edit_search)).perform(clearText());
+        activityTestRule.getActivity().uncheckCheckBoxes();
+        onView(withId(R.id.edit_search)).perform(typeText("Something else"), closeSoftKeyboard());
+        onView(withText("Arts")).perform(click());
+        onView(withText("Business")).perform(click());
+        activityTestRule.getActivity().saveData();
+
+        assertEquals("Something else", preferences.getString(KEYWORD_SEARCH, null));
+        assertEquals('"' + "arts" + '"' + " " + '"' + "business" + '"', preferences.getString(CATEGORIES_SEARCH, null));
+    }
+
+    //OPEN THE SEARCH
+    @Test
+    public void saveDataForNotificationTest() throws Throwable {
+        preferences.edit().putInt(KEY_ACTIVITY, 1).apply();
+        runOnUiThread(new Runnable() {
+            public void run() {
+                // Do stuff…
+                activityTestRule.getActivity().displayNotificationOrSearchScreen();
+            }
+        });
+        //we clear text and uncheck the boxes
+        onView(withId(R.id.edit_search)).perform(clearText());
+        activityTestRule.getActivity().uncheckCheckBoxes();
+        //we type a new text and check a box
+        onView(withId(R.id.edit_search)).perform(typeText("hello"), closeSoftKeyboard());
+        onView(withText("Arts")).perform(click());
+        //we click on the switch button
+        onView(withId(R.id.switch_button)).perform(click());
+
+        //if the switch button is active
+        if (preferences.getInt(SWITCH_BUTTON_STATE, -1) == 0) {
+            //activityTestRule.getActivity().saveDataForNotificationActivity(true);
+            assertEquals(0, preferences.getInt(SWITCH_BUTTON_STATE, -1));
+            assertEquals("hello", preferences.getString(KEYWORD_NOTIFICATION, null));
+        } else {
+            //activityTestRule.getActivity().saveDataForNotificationActivity(false);
+            assertEquals(1, preferences.getInt(SWITCH_BUTTON_STATE, -1));
+            assertNull(preferences.getString(KEYWORD_NOTIFICATION, null));
+        }
+    }
+    @After
+    public void after() {
+        setPreferencesToNull();
+        onView(withId(R.id.edit_search)).perform(clearText());
+        activityTestRule.getActivity().uncheckCheckBoxes();
+    }
     //------------------------------------
     //TESTS STREAM THAT FETCH THE TOP STORIES
     //-----------------------------------------
-
     //test that the number of onNext event is good
     @Test
-    public void NumberOfOnNextEventReceivesTest() throws Exception {
+    public void NumberOfOnNextEventReceivedForTopStoriesTest() throws Exception {
         //get the stream
         Observable<TopStories> observable = ArticlesStreams.streamFetchTopStoriesArticle("home");
         //create an observer
@@ -157,84 +249,28 @@ public class ExampleInstrumentedTest {
                 .assertNoErrors()
                 .assertNoTimeout()
                 .awaitTerminalEvent();
-        testObserver.assertValueCount(1);
+        if (testObserver.values().size() != 0) {
+            testObserver.assertValueCount(1);
+        }
     }
 
     //test that the string section of the fetched article is the same
     @Test
-    public void topStoriesArticleHasStringSectionTest() throws Exception {
+    public void topStoriesReceivedObjectIsCorrectTest() throws Exception {
         Observable<TopStories> observable = ArticlesStreams.streamFetchTopStoriesArticle("arts");
         TestObserver<TopStories> testObserver = new TestObserver<>();
         observable.subscribeWith(testObserver)
                 .assertNoErrors()
                 .assertNoTimeout()
                 .awaitTerminalEvent();
-        TopStories topStories = testObserver.values().get(0);
-        TopStoriesResult result = topStories.getResults().get(0);
-        assertEquals("Arts", result.getSection());
-    }
-
-    //test that the title of the fetched article is not null
-    @Test
-    public void topStoriesArticleTitleIsNotNullTest() throws Exception {
-        Observable<TopStories> observable = ArticlesStreams.streamFetchTopStoriesArticle("home");
-        TestObserver<TopStories> testObserver = new TestObserver<>();
-        observable.subscribeWith(testObserver)
-                .assertNoErrors()
-                .assertNoTimeout()
-                .awaitTerminalEvent();
         if(testObserver.values().size() != 0) {
             TopStories topStories = testObserver.values().get(0);
-            if(topStories.getResults().size() != 0) {
+            if (topStories.getResults().size() != 0) {
                 TopStoriesResult result = topStories.getResults().get(0);
+                assertEquals("Arts", result.getSection());
                 assertNotNull(result.getTitle());
-            }
-        }
-    }
-
-    //test that the article fetched url is not null
-    @Test
-    public void topStoriesArticleUrlIsNotNullTest() throws Exception {
-        Observable<TopStories> observable = ArticlesStreams.streamFetchTopStoriesArticle("home");
-        TestObserver<TopStories> testObserver = new TestObserver<>();
-        observable.subscribeWith(testObserver)
-                .assertNoErrors()
-                .assertNoTimeout()
-                .awaitTerminalEvent();
-        TopStories topStories = testObserver.values().get(0);
-        TopStoriesResult result = topStories.getResults().get(0);
-        assertNotNull(result.getUrl());
-    }
-
-    //test that the status of the object retrieved in onNext is OK
-    @Test
-    public void topStoriesStatusIsOkTest() throws Exception {
-        Observable<TopStories> observable = ArticlesStreams.streamFetchTopStoriesArticle("home");
-        TestObserver<TopStories> testObserver = new TestObserver<>();
-        observable.subscribeWith(testObserver)
-                .assertNoErrors()
-                .assertNoTimeout()
-                .awaitTerminalEvent();
-        if(testObserver.values().size() != 0) {
-            TopStories topStories = testObserver.values().get(0);
-            assertEquals("OK", topStories.getStatus());
-        }
-    }
-
-    //test that the multimedia url is not null
-    @Test
-    public void topStoriesArticleMultimediaTest() throws Exception {
-        Observable<TopStories> observable = ArticlesStreams.streamFetchTopStoriesArticle("home");
-        TestObserver<TopStories> testObserver = new TestObserver<>();
-        observable.subscribeWith(testObserver)
-                .assertNoErrors()
-                .assertNoTimeout()
-                .awaitTerminalEvent();
-        if(testObserver.values().size() != 0) {
-            TopStories topStories = testObserver.values().get(0);
-            if (topStories != null) {
-                TopStoriesResult result = topStories.getResults().get(0);
-
+                assertNotNull(result.getUrl());
+                assertEquals("OK", topStories.getStatus());
                 if (result.getMultimedia().size() != 0) {
                     TopStoriesMultimedia multimedia = result.getMultimedia().get(0);
                     assertNotNull(multimedia.getUrl());
@@ -258,25 +294,25 @@ public class ExampleInstrumentedTest {
     //TESTS STREAM THAT FETCH THE MOST POPULAR ARTICLES
     //-----------------------------------------
 
-    //test that the title of the article is not null
+    //test that the number of onNext event is good
     @Test
-    public void mostPopularArticleTitleIsNotNullTest() throws Exception {
+    public void NumberOfOnNextEventReceivedForMostPopularTest() throws Exception {
+        //get the stream
         Observable<MostPopular> observable = ArticlesStreams.streamFetchMostPopularArticle(1);
+        //create an observer
         TestObserver<MostPopular> testObserver = new TestObserver<>();
         observable.subscribeWith(testObserver)
                 .assertNoErrors()
                 .assertNoTimeout()
                 .awaitTerminalEvent();
-        if(testObserver.values().size() != 0) {
-            MostPopular mostPopular = testObserver.values().get(0);
-            MostPopularResult mostPopularResult = mostPopular.getMostPopularResults().get(0);
-            assertNotNull(mostPopularResult.getTitle());
+        if (testObserver.values().size() != 0) {
+            testObserver.assertValueCount(1);
         }
     }
 
-    //test that the status of the object retrieved in onNext is OK
+    //test that the title of the article is not null
     @Test
-    public void mostPopularStatusIsOkTest() {
+    public void mostPopularReceivedObjectIsCorrectTest() throws Exception {
         Observable<MostPopular> observable = ArticlesStreams.streamFetchMostPopularArticle(1);
         TestObserver<MostPopular> testObserver = new TestObserver<>();
         observable.subscribeWith(testObserver)
@@ -285,7 +321,13 @@ public class ExampleInstrumentedTest {
                 .awaitTerminalEvent();
         if(testObserver.values().size() != 0) {
             MostPopular mostPopular = testObserver.values().get(0);
-            assertEquals("OK", mostPopular.getStatus());
+            if(mostPopular.getMostPopularResults().size() != 0) {
+                MostPopularResult mostPopularResult = mostPopular.getMostPopularResults().get(0);
+                assertNotNull(mostPopularResult.getTitle());
+                assertEquals("OK", mostPopular.getStatus());
+                assertNotNull(mostPopularResult.getUrl());
+                assertNotNull(mostPopularResult.getSection());
+            }
         }
     }
 
@@ -298,43 +340,26 @@ public class ExampleInstrumentedTest {
                 .assertNoValues();
     }
 
-    @Test
-    public void mostPopularArticleUrlIsNotNullTest() throws Exception {
-        Observable<MostPopular> observable = ArticlesStreams.streamFetchMostPopularArticle(1);
-        TestObserver<MostPopular> testObserver = new TestObserver<>();
-        observable.subscribeWith(testObserver)
-                .assertNoErrors()
-                .assertNoTimeout()
-                .awaitTerminalEvent();
-        if(testObserver.values().size() != 0) {
-            MostPopular mostPopular = testObserver.values().get(0);
-            if(mostPopular.getMostPopularResults().size() != 0) {
-                MostPopularResult mostPopularResult = mostPopular.getMostPopularResults().get(0);
-                assertNotNull(mostPopularResult.getUrl());
-            }
-        }
-    }
-
-    @Test
-    public void mostPopularArticleSectionIsNotNull() throws Exception {
-        Observable<MostPopular> observable = ArticlesStreams.streamFetchMostPopularArticle(1);
-        TestObserver<MostPopular> testObserver = new TestObserver<>();
-        observable.subscribeWith(testObserver)
-                .assertNoErrors()
-                .assertNoTimeout()
-                .awaitTerminalEvent();
-        if(testObserver.values().size() != 0) {
-            MostPopular mostPopular = testObserver.values().get(0);
-            if(mostPopular.getMostPopularResults().size() != 0) {
-                MostPopularResult mostPopularResult = mostPopular.getMostPopularResults().get(0);
-                assertNotNull(mostPopularResult.getSection());
-            }
-        }
-    }
-
     //-----------------------------
     //TESTS FOR THE SEARCH STREAM
     //-------------------------------
+
+    //test that the number of onNext event is good
+    @Test
+    public void NumberOfOnNextEventReceivedForSearchTest() throws Exception {
+        //get the stream
+        Observable<SearchArticleObject> observable = ArticlesStreams.streamFetchSearchedArticle("20130102", "20140102", "business", "economic", "newest","TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS");
+        //create an observer
+        TestObserver<SearchArticleObject> testObserver = new TestObserver<>();
+        observable.subscribeWith(testObserver)
+                .assertNoErrors()
+                .assertNoTimeout()
+                .awaitTerminalEvent();
+        if (testObserver.values().size() != 0) {
+            testObserver.assertValueCount(1);
+        }
+    }
+
     @Test
     public void searchArticleStatusIsOkTest() throws Exception {
         Observable<SearchArticleObject> observable = ArticlesStreams.streamFetchSearchedArticle("20130102", "20140102", "business", "economic", "newest", "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS");
@@ -343,55 +368,14 @@ public class ExampleInstrumentedTest {
                 .assertNoErrors()
                 .assertNoTimeout()
                 .awaitTerminalEvent();
-        SearchArticleObject searchObject = testObserver.values().get(0);
-        assertEquals("OK", searchObject.getStatus());
-    }
-
-    @Test
-    public void searchArticleTitleIsNotNullTest() throws Exception {
-        Observable<SearchArticleObject> observable = ArticlesStreams.streamFetchSearchedArticle("20180102", "20190102", "sports", "football", "newest", "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS");
-        TestObserver<SearchArticleObject> testObserver = new TestObserver<>();
-        observable.subscribeWith(testObserver)
-                .assertNoErrors()
-                .assertNoTimeout()
-                .awaitTerminalEvent();
         if(testObserver.values().get(0) != null) {
-            SearchArticleObject search = testObserver.values().get(0);
-            SearchArticleResponse response = search.getResponse();
-            SearchArticle article = response.getArticles().get(0);
-            assertNotNull(article.getHeadline().getMain());
-        }
-    }
-
-    @Test
-    public void searchArticleUrlIsNotNullTest() throws Exception {
-        Observable<SearchArticleObject> observable = ArticlesStreams.streamFetchSearchedArticle("20130102", "20140102", "business", "economic", "newest", "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS");
-        TestObserver<SearchArticleObject> testObserver = new TestObserver<>();
-        observable.subscribeWith(testObserver)
-                .assertNoErrors()
-                .assertNoTimeout()
-                .awaitTerminalEvent();
-        if(testObserver.values().get(0) != null) {
-            SearchArticleObject search = testObserver.values().get(0);
-            SearchArticleResponse response = search.getResponse();
-            SearchArticle article = response.getArticles().get(0);
-            assertNotNull(article.getWebUrl());
-        }
-    }
-
-    @Test
-    public void searchArticleMultimediaUrlIsNotNullTest() throws Exception {
-        Observable<SearchArticleObject> observable = ArticlesStreams.streamFetchSearchedArticle("20130102", "20140102", "business", "economic", "newest", "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS");
-        TestObserver<SearchArticleObject> testObserver = new TestObserver<>();
-        observable.subscribeWith(testObserver)
-                .assertNoErrors()
-                .assertNoTimeout()
-                .awaitTerminalEvent();
-        if(testObserver.values().get(0) != null) {
-            SearchArticleObject search = testObserver.values().get(0);
-            SearchArticleResponse response = search.getResponse();
+            SearchArticleObject searchObject = testObserver.values().get(0);
+            assertEquals("OK", searchObject.getStatus());
+            SearchArticleResponse response = searchObject.getResponse();
             if(response.getArticles().size() != 0) {
                 SearchArticle article = response.getArticles().get(0);
+                assertNotNull(article.getHeadline().getMain());
+                assertNotNull(article.getWebUrl());
                 if(article.getMultimedia().size() != 0) {
                     SearchArticleMultimedium media = article.getMultimedia().get(0);
                     assertNotNull(media.getUrl());
@@ -401,7 +385,7 @@ public class ExampleInstrumentedTest {
     }
 
     @Test
-    public void testSearch() throws Exception {
+    public void searchWrongParamSentTest() throws Exception {
         Observable<SearchArticleObject> observable = ArticlesStreams.streamFetchSearchedArticle("", "", "business", "economic", "newest", "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS");
         TestObserver<SearchArticleObject> testObserver = new TestObserver<>();
         observable.subscribeWith(testObserver);
@@ -409,4 +393,17 @@ public class ExampleInstrumentedTest {
                 .assertNoValues();
     }
 
+    //---------------------
+    public void setPreferencesToNull() {
+        preferences.edit().putString(ARTS, null).apply();
+        preferences.edit().putString(POLITICS, null).apply();
+        preferences.edit().putString(BUSINESS, null).apply();
+        preferences.edit().putString(SPORTS, null).apply();
+        preferences.edit().putString(ENTREPRENEURS, null).apply();
+        preferences.edit().putString(TRAVEL, null).apply();
+        preferences.edit().putString(KEYWORD_SEARCH, null).apply();
+        preferences.edit().putString(KEYWORD_NOTIFICATION, null).apply();
+        preferences.edit().putString(CATEGORIES_SEARCH, null).apply();
+        preferences.edit().putString(CATEGORIES_NOTIFICATION, null).apply();
+    }
 }

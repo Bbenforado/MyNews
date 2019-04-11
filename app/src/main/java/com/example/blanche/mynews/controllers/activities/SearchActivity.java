@@ -93,14 +93,41 @@ public class SearchActivity extends AppCompatActivity {
         preferences = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
         configureToolbar();
         displayNotificationOrSearchScreen();
-        setCurrentKeyword();
-        configureDatesButtons();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        //here we have to save the preferences, keyword and categories
+        //for activity search
+        saveData();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+    }
+
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
 
     }
 
     //----------------
     //CONFIGURATION
     //----------------
+    //FOR BOTH
+    //---------------------------
     private void configureToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -140,10 +167,7 @@ public class SearchActivity extends AppCompatActivity {
                 if (!paramsAreMissing()) {
 
                     if (isChecked) {
-                        preferences.edit().putString(IS_THE_FIRST_NOTIFICATION, "true").apply();
-                        preferences.edit().putString(KEYWORD_NOTIFICATION, editText.getText().toString()).apply();
-                        preferences.edit().putInt(SWITCH_BUTTON_STATE, 0).apply();
-                        getCheckedCheckboxes();
+                        saveDataForNotificationActivity(true);
                         configureWorkRequest();
                         WorkManager.getInstance().enqueueUniquePeriodicWork("periodic_work", ExistingPeriodicWorkPolicy.REPLACE, periodicRequest);
 
@@ -151,9 +175,7 @@ public class SearchActivity extends AppCompatActivity {
                         //uncheck the boxes, erase the edit text, and stop the periodic job
                         editText.setText(null);
                         uncheckCheckBoxes();
-                        preferences.edit().putInt(SWITCH_BUTTON_STATE, 1).apply();
-                        preferences.edit().putString(KEYWORD_NOTIFICATION, null).apply();
-                        preferences.edit().putString(CATEGORIES_NOTIFICATION, null).apply();
+                        saveDataForNotificationActivity(false);
                         WorkManager.getInstance().cancelAllWorkByTag("periodicJob");
                     }
                 } else {
@@ -189,11 +211,9 @@ public class SearchActivity extends AppCompatActivity {
     public void submit(View view) {
         if (!paramsAreMissing()) {
             //launch activity that displays a list of articles depending on the keywords, dates and category checked
-            //save the categories selected
-            getCheckedCheckboxes();
-            //save the keywords selected
-            preferences.edit().putString(KEYWORD_SEARCH, editText.getText().toString()).apply();
             launchSearchArticlesActivity();
+        } else {
+            Toast.makeText(this, R.string.toast_text_no_keyword_no_checked_category, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -441,17 +461,22 @@ public class SearchActivity extends AppCompatActivity {
     private void setCurrentKeyword() {
         if (preferences.getString(KEYWORD_SEARCH, null) != null && preferences.getInt(KEY_ACTIVITY, -1) != 1) {
             editText.setText(preferences.getString(KEYWORD_SEARCH, null));
-        } else if(preferences.getString(KEYWORD_NOTIFICATION, null) != null && preferences.getInt(KEY_ACTIVITY, -1) == 1) {
+        } else {
+            editText.setHint(R.string.query_item);
+        }
+        if (preferences.getString(KEYWORD_NOTIFICATION, null) != null && preferences.getInt(KEY_ACTIVITY, -1) == 1) {
             editText.setText(preferences.getString(KEYWORD_NOTIFICATION, null));
         }
     }
 
-    private void displayNotificationOrSearchScreen() {
+    public void displayNotificationOrSearchScreen() {
         if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
             //display notification
             layoutDates.setVisibility(View.GONE);
             layoutSpinners.setVisibility(View.GONE);
             button.setVisibility(View.GONE);
+            switchButton.setVisibility(View.VISIBLE);
+            surfaceView.setVisibility(View.VISIBLE);
             actionBar.setTitle("Notifications");
             configureSwitchButton();
             if (preferences.getInt(SWITCH_BUTTON_STATE, -1) == 0) {
@@ -461,11 +486,16 @@ public class SearchActivity extends AppCompatActivity {
         } else if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
             switchButton.setVisibility(View.GONE);
             surfaceView.setVisibility(View.GONE);
+            layoutDates.setVisibility(View.VISIBLE);
+            layoutSpinners.setVisibility(View.VISIBLE);
+            button.setVisibility(View.VISIBLE);
             setSavedCheckedCategories();
+            configureDatesButtons();
         }
+        setCurrentKeyword();
     }
 
-    private void uncheckCheckBoxes() {
+    public void uncheckCheckBoxes() {
         checkboxArts.setChecked(false);
         checkboxPolitics.setChecked(false);
         checkboxBusiness.setChecked(false);
@@ -524,5 +554,28 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
+    //-----------------------------
+    //SAVE DATA
+    //-----------------------------------------
+
+    public void saveData() {
+        if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
+            preferences.edit().putString(KEYWORD_SEARCH, editText.getText().toString()).apply();
+            getCheckedCheckboxes();
+        }
+    }
+
+    public void saveDataForNotificationActivity(Boolean isChecked) {
+        if (isChecked) {
+            preferences.edit().putString(IS_THE_FIRST_NOTIFICATION, "true").apply();
+            preferences.edit().putString(KEYWORD_NOTIFICATION, editText.getText().toString()).apply();
+            preferences.edit().putInt(SWITCH_BUTTON_STATE, 0).apply();
+            getCheckedCheckboxes();
+        } else {
+            preferences.edit().putInt(SWITCH_BUTTON_STATE, 1).apply();
+            preferences.edit().putString(KEYWORD_NOTIFICATION, null).apply();
+            preferences.edit().putString(CATEGORIES_NOTIFICATION, null).apply();
+        }
+    }
 
 }

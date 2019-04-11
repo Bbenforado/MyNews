@@ -47,7 +47,6 @@ public class GetArticlesWorker extends Worker {
             executeHttpRequest(null, null, categories, keyword);
         }
         preferences.edit().putString(IS_THE_FIRST_NOTIFICATION, "false").apply();
-        System.out.println("preference 2 = " + preferences.getString(IS_THE_FIRST_NOTIFICATION, null));
         return Result.success();
     }
 
