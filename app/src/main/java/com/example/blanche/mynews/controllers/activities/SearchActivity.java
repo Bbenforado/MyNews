@@ -126,19 +126,6 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * takes in param a date (string) format yyyyMMdd and return a string format dd/MM/yyyy
-     * @param date
-     * @return
-     */
-    public String changeSavedDateFormat(String date) {
-        String year = date.substring(0, 4);
-        String month = date.substring(4, 6);
-        String day = date.substring(6, 8);
-        String result = day + "/" + month + "/" + year;
-        return result;
-    }
-
     //NOTIFICATION ACTIVITY
     //-----------------------------
     private void configureSwitchButton() {
@@ -187,7 +174,6 @@ public class SearchActivity extends AppCompatActivity {
     //---------------
     //ACTIONS
     //---------------
-
     //SEARCH ACTIVITY
     //--------------------------------
     @OnClick(R.id.search_button)
@@ -205,7 +191,7 @@ public class SearchActivity extends AppCompatActivity {
         datePickerDialog.show();
     }
     //------------------------------------------------------------
-    //FOR SEARCH ACTIVITY
+    //METHODS FOR SEARCH ACTIVITY
     //--------------------------------
     /**
      * displays a datePickerDialog, and saves the selected date (begin and end date)
@@ -247,35 +233,6 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     /**
-     * save the selected date when click on the OK button of the datePickerDialog
-     * @param v
-     * @param dayOfMonth
-     * @param month
-     * @param year
-     */
-    private  void saveDates(View v, int dayOfMonth, int month, int year) {
-            String strMonth = addZeroToDate(Integer.toString(month + 1));
-            String strDay = addZeroToDate(Integer.toString(dayOfMonth));
-            String strYear = Integer.toString(year);
-            switch (v.getId()) {
-                case R.id.spinner_button_start_date:
-                    beginDateButton.setText(strDay + "/" + strMonth + "/" + strYear);
-                    preferences.edit().putString(BEGIN_DATE, strYear + strMonth + strDay).apply();
-                    break;
-                case R.id.spinner_button_end_date:
-                        if (isBeginDateBeforeEndDate(dayOfMonth, month, year)) {
-                            endDateButton.setText(strDay + "/" + strMonth + "/" + strYear);
-                            preferences.edit().putString(END_DATE, strYear + strMonth + strDay).apply();
-                        } else {
-                            Toast.makeText(this, "You have to select a date after the begin date...", Toast.LENGTH_SHORT).show();
-                        }
-                    break;
-                default:
-                    break;
-            }
-    }
-
-    /**
      * check if the selected date is after the selected begin date
      * @param day
      * @param month
@@ -296,6 +253,19 @@ public class SearchActivity extends AppCompatActivity {
         } else {
             return false;
         }
+    }
+
+    /**
+     * takes in param a date (string) format yyyyMMdd and return a string format dd/MM/yyyy
+     * @param date
+     * @return
+     */
+    public String changeSavedDateFormat(String date) {
+        String year = date.substring(0, 4);
+        String month = date.substring(4, 6);
+        String day = date.substring(6, 8);
+        String result = day + "/" + month + "/" + year;
+        return result;
     }
 
     /**
@@ -335,9 +305,29 @@ public class SearchActivity extends AppCompatActivity {
         startActivity(searchArticlesActivity);
     }
 
+    private void setCheckedCategoriesForSearchPage() {
+        if (preferences.getString(ARTS, null) != null) {
+            checkboxArts.setChecked(true);
+        }
+        if (preferences.getString(POLITICS, null) != null) {
+            checkboxPolitics.setChecked(true);
+        }
+        if (preferences.getString(BUSINESS, null) != null) {
+            checkboxBusiness.setChecked(true);
+        }
+        if (preferences.getString(SPORTS, null) != null) {
+            checkboxSports.setChecked(true);
+        }
+        if (preferences.getString(ENTREPRENEURS, null) != null) {
+            checkboxEntrepreneurs.setChecked(true);
+        }
+        if (preferences.getString(TRAVEL, null) != null) {
+            checkboxTravel.setChecked(true);
+        }
+    }
+
     //FOR NOTIFICATIONS
     //------------------------------------
-
     /**
      * display the current button state, on or off, depending on what is saved in preferences
      */
@@ -349,9 +339,29 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
+    private void setCheckedCategoriesForNotificationPage() {
+        if (preferences.getString(ARTS_NOTIF, null) != null) {
+            checkboxArts.setChecked(true);
+        }
+        if (preferences.getString(POLITICS_NOTIF, null) != null) {
+            checkboxPolitics.setChecked(true);
+        }
+        if (preferences.getString(BUSINESS_NOTIF, null) != null) {
+            checkboxBusiness.setChecked(true);
+        }
+        if (preferences.getString(SPORTS_NOTIF, null) != null) {
+            checkboxSports.setChecked(true);
+        }
+        if (preferences.getString(ENTREPRENEURS_NOTIF, null) != null) {
+            checkboxEntrepreneurs.setChecked(true);
+        }
+        if (preferences.getString(TRAVEL_NOTIF, null) != null) {
+            checkboxTravel.setChecked(true);
+        }
+    }
+
     //FOR BOTH
     //---------------------------------
-
     /**
      * verify that keyword is written AND a category is checked
      * @return true: if the param are missing
@@ -371,6 +381,77 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * set the text of the edittext with the keyword saved in preferences, depending on activity displayed
+     * set default hint if no keywords are saved
+     */
+    private void setCurrentKeyword() {
+        if (preferences.getString(KEYWORD_SEARCH, null) != null && preferences.getInt(KEY_ACTIVITY, -1) != 1) {
+            editText.setText(preferences.getString(KEYWORD_SEARCH, null));
+        } else {
+            editText.setHint(R.string.query_item);
+        }
+        if (preferences.getString(KEYWORD_NOTIFICATION, null) != null && preferences.getInt(KEY_ACTIVITY, -1) == 1) {
+            editText.setText(preferences.getString(KEYWORD_NOTIFICATION, null));
+        }
+    }
+
+    /**
+     * displays the correct activity (notification or search) depending on KEY_ACTIVITY
+     */
+    public void displayNotificationOrSearchScreen() {
+        if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
+            //display notification
+            layoutDates.setVisibility(View.GONE);
+            layoutSpinners.setVisibility(View.GONE);
+            button.setVisibility(View.GONE);
+            switchButton.setVisibility(View.VISIBLE);
+            surfaceView.setVisibility(View.VISIBLE);
+            actionBar.setTitle("Notifications");
+            configureSwitchButton();
+            if (preferences.getInt(SWITCH_BUTTON_STATE, -1) == 0) {
+                setSavedCheckedCategories();
+            }
+        } else if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
+            switchButton.setVisibility(View.GONE);
+            surfaceView.setVisibility(View.GONE);
+            layoutDates.setVisibility(View.VISIBLE);
+            layoutSpinners.setVisibility(View.VISIBLE);
+            button.setVisibility(View.VISIBLE);
+            setSavedCheckedCategories();
+            configureDatesButtons();
+        }
+        setCurrentKeyword();
+    }
+
+    /**
+     * unchecked all the boxes
+     */
+    public void uncheckCheckBoxes() {
+        checkboxArts.setChecked(false);
+        checkboxPolitics.setChecked(false);
+        checkboxBusiness.setChecked(false);
+        checkboxSports.setChecked(false);
+        checkboxEntrepreneurs.setChecked(false);
+        checkboxTravel.setChecked(false);
+    }
+
+    /**
+     * set the categories state (checked or not) depending on the activity displayed and on the state saved
+     */
+    private void setSavedCheckedCategories() {
+        if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
+            setCheckedCategoriesForSearchPage();
+        } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
+            setCheckedCategoriesForNotificationPage();
+        }
+    }
+
+    //-----------------------------
+    //SAVE DATA
+    //-----------------------------------------
+    //FOR BOTH
+    //----------------------
     /**
      * checks which checkbox is checked or not
      * creates a string with the categories names of all the checked boxes
@@ -474,117 +555,37 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
+    //--------------
+    //FOR SEARCH ACTIVITY
+    //-----------------------
     /**
-     * set the text of the edittext with the keyword saved in preferences, depending on activity displayed
-     * set default hint if no keywords are saved
+     * save the selected date when click on the OK button of the datePickerDialog
+     * @param v
+     * @param dayOfMonth
+     * @param month
+     * @param year
      */
-    private void setCurrentKeyword() {
-        if (preferences.getString(KEYWORD_SEARCH, null) != null && preferences.getInt(KEY_ACTIVITY, -1) != 1) {
-            editText.setText(preferences.getString(KEYWORD_SEARCH, null));
-        } else {
-            editText.setHint(R.string.query_item);
-        }
-        if (preferences.getString(KEYWORD_NOTIFICATION, null) != null && preferences.getInt(KEY_ACTIVITY, -1) == 1) {
-            editText.setText(preferences.getString(KEYWORD_NOTIFICATION, null));
-        }
-    }
-
-    /**
-     * display the correct activity (notification or search) depending on KEY_ACTIVITY
-     */
-    public void displayNotificationOrSearchScreen() {
-        if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
-            //display notification
-            layoutDates.setVisibility(View.GONE);
-            layoutSpinners.setVisibility(View.GONE);
-            button.setVisibility(View.GONE);
-            switchButton.setVisibility(View.VISIBLE);
-            surfaceView.setVisibility(View.VISIBLE);
-            actionBar.setTitle("Notifications");
-            configureSwitchButton();
-            if (preferences.getInt(SWITCH_BUTTON_STATE, -1) == 0) {
-                setSavedCheckedCategories();
-            }
-        } else if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
-            switchButton.setVisibility(View.GONE);
-            surfaceView.setVisibility(View.GONE);
-            layoutDates.setVisibility(View.VISIBLE);
-            layoutSpinners.setVisibility(View.VISIBLE);
-            button.setVisibility(View.VISIBLE);
-            setSavedCheckedCategories();
-            configureDatesButtons();
-        }
-        setCurrentKeyword();
-    }
-
-    /**
-     * unchecked all the boxes
-     */
-    public void uncheckCheckBoxes() {
-        checkboxArts.setChecked(false);
-        checkboxPolitics.setChecked(false);
-        checkboxBusiness.setChecked(false);
-        checkboxSports.setChecked(false);
-        checkboxEntrepreneurs.setChecked(false);
-        checkboxTravel.setChecked(false);
-    }
-
-    /**
-     * set the categories state (checked or not) depending on the activity displayed and on the state saved
-     */
-    private void setSavedCheckedCategories() {
-        if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
-            setCheckedCategoriesForSearchPage();
-        } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
-            setCheckedCategoriesForNotificationPage();
+    private  void saveDates(View v, int dayOfMonth, int month, int year) {
+        String strMonth = addZeroToDate(Integer.toString(month + 1));
+        String strDay = addZeroToDate(Integer.toString(dayOfMonth));
+        String strYear = Integer.toString(year);
+        switch (v.getId()) {
+            case R.id.spinner_button_start_date:
+                beginDateButton.setText(strDay + "/" + strMonth + "/" + strYear);
+                preferences.edit().putString(BEGIN_DATE, strYear + strMonth + strDay).apply();
+                break;
+            case R.id.spinner_button_end_date:
+                if (isBeginDateBeforeEndDate(dayOfMonth, month, year)) {
+                    endDateButton.setText(strDay + "/" + strMonth + "/" + strYear);
+                    preferences.edit().putString(END_DATE, strYear + strMonth + strDay).apply();
+                } else {
+                    Toast.makeText(this, "You have to select a date after the begin date...", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            default:
+                break;
         }
     }
-
-    private void setCheckedCategoriesForSearchPage() {
-        if (preferences.getString(ARTS, null) != null) {
-            checkboxArts.setChecked(true);
-        }
-        if (preferences.getString(POLITICS, null) != null) {
-            checkboxPolitics.setChecked(true);
-        }
-        if (preferences.getString(BUSINESS, null) != null) {
-            checkboxBusiness.setChecked(true);
-        }
-        if (preferences.getString(SPORTS, null) != null) {
-            checkboxSports.setChecked(true);
-        }
-        if (preferences.getString(ENTREPRENEURS, null) != null) {
-            checkboxEntrepreneurs.setChecked(true);
-        }
-        if (preferences.getString(TRAVEL, null) != null) {
-            checkboxTravel.setChecked(true);
-        }
-    }
-
-    private void setCheckedCategoriesForNotificationPage() {
-        if (preferences.getString(ARTS_NOTIF, null) != null) {
-            checkboxArts.setChecked(true);
-        }
-        if (preferences.getString(POLITICS_NOTIF, null) != null) {
-            checkboxPolitics.setChecked(true);
-        }
-        if (preferences.getString(BUSINESS_NOTIF, null) != null) {
-            checkboxBusiness.setChecked(true);
-        }
-        if (preferences.getString(SPORTS_NOTIF, null) != null) {
-            checkboxSports.setChecked(true);
-        }
-        if (preferences.getString(ENTREPRENEURS_NOTIF, null) != null) {
-            checkboxEntrepreneurs.setChecked(true);
-        }
-        if (preferences.getString(TRAVEL_NOTIF, null) != null) {
-            checkboxTravel.setChecked(true);
-        }
-    }
-
-    //-----------------------------
-    //SAVE DATA
-    //-----------------------------------------
 
     /**
      * save keyword and string of categories checked in preferences
@@ -596,6 +597,9 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
+    //----------------------
+    //FOR NOTIFICATION ACTIVITY
+    //----------------------------
     /**
      * save keyword, string of checked categories and switch button state (on/off) in preferences
      * @param isChecked
@@ -612,5 +616,4 @@ public class SearchActivity extends AppCompatActivity {
             preferences.edit().putString(CATEGORIES_NOTIFICATION, null).apply();
         }
     }
-
 }
