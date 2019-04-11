@@ -35,8 +35,6 @@ import io.reactivex.observers.DisposableObserver;
  */
 public class SecondPageFragment extends Fragment {
 
-    public static final String KEY_POSITION = "position";
-
     @BindView(R.id.fragment_second_page_recycler_view) RecyclerView recyclerView;
     @BindView(R.id.fragment_second_page_swipe_container)
     SwipeRefreshLayout swipeRefreshLayout;
@@ -46,6 +44,7 @@ public class SecondPageFragment extends Fragment {
     private Disposable disposable;
     public static final String KEY_ARTICLE = "key_article";
     public static final String ARTICLE_TITLE = "article_title";
+    public static final String KEY_POSITION = "position";
     Bundle bundle;
 
     //CONSTRUCTOR
@@ -65,8 +64,6 @@ public class SecondPageFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View result = inflater.inflate(R.layout.fragment_second_page, container, false);
-
-        int position = getArguments().getInt(KEY_POSITION, -1);
 
         ButterKnife.bind(this, result);
         configureRecyclerView();
@@ -118,9 +115,8 @@ public class SecondPageFragment extends Fragment {
     }
 
     //----------------------------
-    //HTTP REQUEST RETROFIT + REACTIVE X
+    //HTTP REQUEST
     //-----------------------------------------
-
     public void executeHttpRequestMostPopular() {
         this.disposable =
                 ArticlesStreams.streamFetchMostPopularArticle(7).subscribeWith(new DisposableObserver<MostPopular>() {
@@ -153,21 +149,10 @@ public class SecondPageFragment extends Fragment {
     //----------------------
     //UPDATE UI
     //---------------------
-
     private void updateUIMostPopular(List<MostPopularResult> results) {
         swipeRefreshLayout.setRefreshing(false);
         mostPopularResultList.clear();
         mostPopularResultList.addAll(results);
         adapter.notifyDataSetChanged();
     }
-
-    //-----------------------
-    public void openWebPage(String url) {
-        Uri webpage = Uri.parse(url);
-        Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
-        if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
-            startActivity(intent);
-        }
-    }
-
 }

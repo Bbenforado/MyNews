@@ -111,6 +111,13 @@ public class ArticlesByCategoryActivity extends AppCompatActivity {
     //HTTP REQUEST RETROFIT & REACTIVE X
     //------------------------------------
 
+    /**
+     * go get articles for the given params
+     * @param beginDate
+     * @param endDate
+     * @param category
+     * @param keyword
+     */
     private void executeHttpRequest(String beginDate, String endDate, String category, String keyword) {
         Disposable disposable = ArticlesStreams.streamFetchSearchedArticle(beginDate, endDate, category, keyword, "newest", "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS").subscribeWith(new DisposableObserver<SearchArticleObject>() {
             @Override
@@ -151,6 +158,4 @@ public class ArticlesByCategoryActivity extends AppCompatActivity {
         String result = string.substring(0, 1).toUpperCase() + string.substring(1);
         return result;
     }
-
-
 }

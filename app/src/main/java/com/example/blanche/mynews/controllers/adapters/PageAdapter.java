@@ -21,6 +21,9 @@ public class PageAdapter extends FragmentPagerAdapter {
         this.texts = text;
     }
 
+    //-------------
+    //METHODS
+    //---------------
     @Override
     public Fragment getItem(int position) {
         switch (position) {

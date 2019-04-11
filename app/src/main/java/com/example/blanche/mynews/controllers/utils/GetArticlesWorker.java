@@ -14,19 +14,22 @@ import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
-
 import static android.content.Context.MODE_PRIVATE;
 
-
+/**
+ * in this class we have the work that will be executed when the notifications are "on"
+ * the work is in the method doWork()
+ * we go check articles found for the criterias entered by the user and inform the user once a day how many articles are found
+ * by sending a notification
+ */
 public class GetArticlesWorker extends Worker {
-    SharedPreferences preferences;
+    private SharedPreferences preferences;
     public static final String APP_PREFERENCES = "appPreferences";
     public static final String IS_THE_FIRST_NOTIFICATION = "notification";
     public static final String CATEGORIES_WORKER = "categories";
     public static final String KEYWORD_WORKER= "keyword";
-    Disposable disposable;
-    int size;
-
+    private Disposable disposable;
+    private int size;
 
     public GetArticlesWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
@@ -37,12 +40,14 @@ public class GetArticlesWorker extends Worker {
     public Result doWork() {
 
         preferences = getApplicationContext().getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
+        //get the strings that will be passed as param
         String isTheFirstNotification = preferences.getString(IS_THE_FIRST_NOTIFICATION, null);
-        System.out.println("preference = " + isTheFirstNotification);
         String categories = getInputData().getString(CATEGORIES_WORKER);
         String dataKeyword = getInputData().getString(KEYWORD_WORKER);
         String keyword = "headline:(\""+ dataKeyword +"\")";
-        //do the work here
+
+        //first notification is immediate, but we want it only once a day, so won't send the first notification
+        //if it's not the first time, we can send notification
         if (isTheFirstNotification.equals("false")) {
             executeHttpRequest(null, null, categories, keyword);
         }
@@ -80,7 +85,6 @@ public class GetArticlesWorker extends Worker {
                                 Log.e("TAG", "on next");
                                 SearchArticleResponse searchArticleResponse = searchArticleObject.getResponse();
                                 size = searchArticleResponse.getArticles().size();
-                                System.out.println("size = " + size);
                                 displayTextNotificationDependingOnResults(size);
                             }
 
@@ -96,6 +100,10 @@ public class GetArticlesWorker extends Worker {
                         });
     }
 
+    /**
+     * displays the good texts for notification, depending on the results found
+     * @param size
+     */
     private void displayTextNotificationDependingOnResults(int size) {
         if (size > 0) {
             String sizeStr = Integer.toString(size);

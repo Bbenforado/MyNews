@@ -25,12 +25,11 @@ import com.example.blanche.mynews.controllers.adapters.PageAdapter;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-
     private DrawerLayout drawerLayout;
     private Toolbar toolbar;
     private NavigationView navigationView;
-    Bundle bundle;
-    SharedPreferences preferences;
+    private Bundle bundle;
+    private SharedPreferences preferences;
     public static final String APP_PREFERENCES = "appPreferences";
     public static final String KEY_BUTTON = "key_button";
     public static final String KEY_ACTIVITY = "key_activity";
@@ -56,6 +55,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    /**
+     * launchs activity depending on item clicked
+     * @param menuItem
+     * @return
+     */
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.menu_main_search:
@@ -63,7 +67,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 launchSearchActivity();
                 return true;
             case R.id.menu_main_notifications:
-                //launchNotificationsActivity();
                 preferences.edit().putInt(KEY_ACTIVITY, 1).apply();
                 launchSearchActivity();
                 return true;
@@ -80,7 +83,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     //---------------------
     //CONFIGURATION
     //----------------------------
-
     private void configureToolbar() {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -117,6 +119,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    /**
+     * launchs activity that displays articles found for the category selected (depending on the item you clicked on)
+     * @param menuItem
+     * @return
+     */
     @Override
     public boolean onNavigationItemSelected(MenuItem menuItem) {
 
@@ -162,6 +169,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     //-----------------
 
+    /**
+     * verify if there is a internet connection
+     * @return
+     */
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);

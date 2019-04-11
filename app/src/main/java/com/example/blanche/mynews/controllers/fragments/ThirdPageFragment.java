@@ -37,7 +37,6 @@ import io.reactivex.observers.DisposableObserver;
  * A simple {@link Fragment} subclass.
  */
 public class ThirdPageFragment extends Fragment {
-
     public static final String KEY_POSITION = "position";
     public static final String KEY_ARTICLE = "key_article";
     public static final String ARTICLE_TITLE = "article_title";
@@ -67,7 +66,6 @@ public class ThirdPageFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View result = inflater.inflate(R.layout.fragment_third_page, container, false);
-        int position = getArguments().getInt(KEY_POSITION, -1);
         ButterKnife.bind(this, result);
         configureRecyclerView();
         configureSwipeRefreshLayout();
@@ -119,9 +117,8 @@ public class ThirdPageFragment extends Fragment {
     }
 
     //----------------------------
-    //HTTP REQUEST RETROFIT + REACTIVE X
+    //HTTP REQUEST
     //-----------------------------------------
-
     public void executeHttpRequestSearchArticle() {
         this.disposable =
                 ArticlesStreams.streamFetchSearchedArticle(null, null, "arts", null,"newest",  "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS")
@@ -155,7 +152,6 @@ public class ThirdPageFragment extends Fragment {
     //----------------------
     //UPDATE UI
     //---------------------
-
     private void updateUISearchArticle(List<SearchArticle> results) {
         swipeRefreshLayout.setRefreshing(false);
         searchArticleList.clear();

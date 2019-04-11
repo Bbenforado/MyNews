@@ -15,7 +15,7 @@ public class WebviewActivity extends AppCompatActivity {
 
     @BindView(R.id.webview)
     WebView webView;
-    Bundle bundle;
+    private Bundle bundle;
     public static final String KEY_ARTICLE = "key_article";
     public static final String ARTICLE_TITLE = "article_title";
 
@@ -25,7 +25,6 @@ public class WebviewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_webview);
         ButterKnife.bind(this);
 
-
         bundle = getIntent().getExtras();
         configureToolbar();
         webView.loadUrl(bundle.getString(KEY_ARTICLE));
@@ -34,9 +33,7 @@ public class WebviewActivity extends AppCompatActivity {
     private void configureToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        //get a support actionbar corresponding to this toolbar
         ActionBar actionBar = getSupportActionBar();
-        //enable the up button
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(bundle.getString(ARTICLE_TITLE));
     }

@@ -31,18 +31,14 @@ public interface NyTimesService {
     Observable<MostPopular> getMostPopularArticleDependingOnPeriod(@Path("period") int period);
 
     //SEARCH ARTICLE REQUEST
-    @GET("articlesearch.json?")
+    @GET("search/v2/articlesearch.json?")
     Observable<SearchArticleObject> getArticleBySearch (@Query("begin_date") String beginDate,
                                            @Query("end_date") String endDate,
                                            @Query("q") String category,
                                            @Query("fq") String keyword,
                                            @Query("sort") String sort,
                                            @Query("api-key") String apikey);
-    Retrofit retrofitSearch = new Retrofit.Builder()
-            .baseUrl("https://api.nytimes.com/svc/search/v2/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .build();
+
 
 
 }

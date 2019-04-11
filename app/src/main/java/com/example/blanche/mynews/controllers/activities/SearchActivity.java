@@ -37,9 +37,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class SearchActivity extends AppCompatActivity {
-
     //BINDVIEWS
-
     @BindView(R.id.search_button) Button button;
     @BindView(R.id.spinner_button_start_date) Button beginDateButton;
     @BindView(R.id.spinner_button_end_date) Button endDateButton;
@@ -78,11 +76,10 @@ public class SearchActivity extends AppCompatActivity {
     public static final String END_DATE = "end_date";
     private DatePickerDialog datePickerDialog;
     private String currentDate;
-    ActionBar actionBar;
-    SharedPreferences preferences;
+    private ActionBar actionBar;
+    private SharedPreferences preferences;
     public static final String SWITCH_BUTTON_STATE = "state";
-    PeriodicWorkRequest periodicRequest;
-    Data data;
+    private PeriodicWorkRequest periodicRequest;
     public static final String IS_THE_FIRST_NOTIFICATION = "notification";
 
     @Override
@@ -99,28 +96,9 @@ public class SearchActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         //here we have to save the preferences, keyword and categories
-        //for activity search
-        saveData();
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-
-    }
-
-
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
+        if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
+            saveData();
+        }
     }
 
     //----------------
@@ -148,6 +126,11 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * takes in param a date (string) format yyyyMMdd and return a string format dd/MM/yyyy
+     * @param date
+     * @return
+     */
     public String changeSavedDateFormat(String date) {
         String year = date.substring(0, 4);
         String month = date.substring(4, 6);
@@ -186,7 +169,7 @@ public class SearchActivity extends AppCompatActivity {
     }
 
     private void configureWorkRequest() {
-        data = new Data.Builder()
+        Data data = new Data.Builder()
                 .putString(GetArticlesWorker.CATEGORIES_WORKER, preferences.getString(CATEGORIES_NOTIFICATION, null))
                 .putString(GetArticlesWorker.KEYWORD_WORKER, preferences.getString(KEYWORD_NOTIFICATION, null))
                 .build();
@@ -210,7 +193,6 @@ public class SearchActivity extends AppCompatActivity {
     @OnClick(R.id.search_button)
     public void submit(View view) {
         if (!paramsAreMissing()) {
-            //launch activity that displays a list of articles depending on the keywords, dates and category checked
             launchSearchArticlesActivity();
         } else {
             Toast.makeText(this, R.string.toast_text_no_keyword_no_checked_category, Toast.LENGTH_SHORT).show();
@@ -222,18 +204,13 @@ public class SearchActivity extends AppCompatActivity {
         createDatePickerDialog(view);
         datePickerDialog.show();
     }
-
-    //NOTIFICATIONS ACTIVITY
-    //-------------------------------------
-
-
-
-
     //------------------------------------------------------------
-
     //FOR SEARCH ACTIVITY
     //--------------------------------
-
+    /**
+     * displays a datePickerDialog, and saves the selected date (begin and end date)
+     * @param v
+     */
     private void createDatePickerDialog(final View v) {
        final Calendar calendar = Calendar.getInstance();
         int day = calendar.get(Calendar.DAY_OF_MONTH);
@@ -269,6 +246,13 @@ public class SearchActivity extends AppCompatActivity {
         }, year, month, day);
     }
 
+    /**
+     * save the selected date when click on the OK button of the datePickerDialog
+     * @param v
+     * @param dayOfMonth
+     * @param month
+     * @param year
+     */
     private  void saveDates(View v, int dayOfMonth, int month, int year) {
             String strMonth = addZeroToDate(Integer.toString(month + 1));
             String strDay = addZeroToDate(Integer.toString(dayOfMonth));
@@ -291,6 +275,13 @@ public class SearchActivity extends AppCompatActivity {
             }
     }
 
+    /**
+     * check if the selected date is after the selected begin date
+     * @param day
+     * @param month
+     * @param year
+     * @return
+     */
     private boolean isBeginDateBeforeEndDate(int day, int month, int year) {
         String dateBegin = beginDateButton.getText().toString();
         String dateEnd = String.valueOf(day + "/" + (month+1) + "/" + year);
@@ -307,6 +298,11 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * display a toast message which says that the selected date is not correct
+     * set the current date to the button
+     * @param v
+     */
     private void displayWrongDateSelectedMessage(View v) {
         Toast.makeText(getApplicationContext(), "You have to select a passed or current date...", Toast.LENGTH_SHORT).show();
         setDateOnButton((Button)v , currentDate);
@@ -319,6 +315,10 @@ public class SearchActivity extends AppCompatActivity {
         return string;
     }
 
+    /**
+     * return the current date in a string, pattern is : dd/MM/yy
+     * @return
+     */
     public String getCurrentDate() {
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
@@ -337,6 +337,10 @@ public class SearchActivity extends AppCompatActivity {
 
     //FOR NOTIFICATIONS
     //------------------------------------
+
+    /**
+     * display the current button state, on or off, depending on what is saved in preferences
+     */
     private void displaySwitchButtonState() {
         if (preferences.getInt(SWITCH_BUTTON_STATE, -1) == 0) {
             switchButton.setChecked(true);
@@ -348,19 +352,31 @@ public class SearchActivity extends AppCompatActivity {
     //FOR BOTH
     //---------------------------------
 
+    /**
+     * verify that keyword is written AND a category is checked
+     * @return true: if the param are missing
+     *         false: if it's correct
+     */
     private boolean paramsAreMissing() {
         if (TextUtils.isEmpty(editText.getText().toString()) && !checkboxArts.isChecked() && !checkboxPolitics.isChecked() && !checkboxBusiness.isChecked()
                 && !checkboxSports.isChecked() && !checkboxEntrepreneurs.isChecked() && !checkboxTravel.isChecked() || TextUtils.isEmpty(editText.getText().toString()) ||
                 !checkboxArts.isChecked() && !checkboxPolitics.isChecked() && !checkboxBusiness.isChecked()
                         && !checkboxSports.isChecked() && !checkboxEntrepreneurs.isChecked() && !checkboxTravel.isChecked()) {
-
-            switchButton.setChecked(false);
+            if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
+                switchButton.setChecked(false);
+            }
             return true;
         } else {
             return false;
         }
     }
 
+    /**
+     * checks which checkbox is checked or not
+     * creates a string with the categories names of all the checked boxes
+     * saves this string in preferences, depending on the activity displayed
+     * saves all the states of checkboxes, depending on activity displayed in preferences
+     */
     public void getCheckedCheckboxes() {
         StringBuilder stringBuilder = new StringBuilder();
         if (checkboxArts.isChecked()) {
@@ -458,6 +474,10 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * set the text of the edittext with the keyword saved in preferences, depending on activity displayed
+     * set default hint if no keywords are saved
+     */
     private void setCurrentKeyword() {
         if (preferences.getString(KEYWORD_SEARCH, null) != null && preferences.getInt(KEY_ACTIVITY, -1) != 1) {
             editText.setText(preferences.getString(KEYWORD_SEARCH, null));
@@ -469,6 +489,9 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * display the correct activity (notification or search) depending on KEY_ACTIVITY
+     */
     public void displayNotificationOrSearchScreen() {
         if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
             //display notification
@@ -482,7 +505,6 @@ public class SearchActivity extends AppCompatActivity {
             if (preferences.getInt(SWITCH_BUTTON_STATE, -1) == 0) {
                 setSavedCheckedCategories();
             }
-
         } else if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
             switchButton.setVisibility(View.GONE);
             surfaceView.setVisibility(View.GONE);
@@ -495,6 +517,9 @@ public class SearchActivity extends AppCompatActivity {
         setCurrentKeyword();
     }
 
+    /**
+     * unchecked all the boxes
+     */
     public void uncheckCheckBoxes() {
         checkboxArts.setChecked(false);
         checkboxPolitics.setChecked(false);
@@ -504,6 +529,9 @@ public class SearchActivity extends AppCompatActivity {
         checkboxTravel.setChecked(false);
     }
 
+    /**
+     * set the categories state (checked or not) depending on the activity displayed and on the state saved
+     */
     private void setSavedCheckedCategories() {
         if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
             setCheckedCategoriesForSearchPage();
@@ -558,6 +586,9 @@ public class SearchActivity extends AppCompatActivity {
     //SAVE DATA
     //-----------------------------------------
 
+    /**
+     * save keyword and string of categories checked in preferences
+     */
     public void saveData() {
         if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
             preferences.edit().putString(KEYWORD_SEARCH, editText.getText().toString()).apply();
@@ -565,6 +596,10 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * save keyword, string of checked categories and switch button state (on/off) in preferences
+     * @param isChecked
+     */
     public void saveDataForNotificationActivity(Boolean isChecked) {
         if (isChecked) {
             preferences.edit().putString(IS_THE_FIRST_NOTIFICATION, "true").apply();

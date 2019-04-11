@@ -27,7 +27,6 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 
 public class PageFragment extends Fragment {
-
     public static final String KEY_POSITION = "position";
     public static final String KEY_ARTICLE = "key_article";
     public static final String ARTICLE_TITLE = "article_title";
@@ -35,7 +34,6 @@ public class PageFragment extends Fragment {
     @BindView(R.id.fragment_page_recycler_view) RecyclerView recyclerView;
     @BindView(R.id.fragment_page_swipe_container) SwipeRefreshLayout swipeRefreshLayout;
     private List<TopStoriesResult> topStoriesResultList;
-    private List<TopStoriesMultimedia> topStoriesMultimedia;
     private RecyclerViewAdapter adapter;
     private Disposable disposable;
     Bundle bundle;
@@ -57,7 +55,6 @@ public class PageFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
             View result = inflater.inflate(R.layout.fragment_page, container, false);
-            int position = getArguments().getInt(KEY_POSITION, -1);
             ButterKnife.bind(this, result);
 
             configureRecyclerView();
@@ -109,9 +106,8 @@ public class PageFragment extends Fragment {
                 });
     }
     //----------------------------
-    //HTTP REQUEST RETROFIT + REACTIVE X
+    //HTTP REQUEST
     //-----------------------------------------
-
     public void executeHttpRequestTopStories() {
         this.disposable =
                 ArticlesStreams.streamFetchTopStoriesArticle("home").subscribeWith(new DisposableObserver<TopStories>() {
@@ -132,12 +128,14 @@ public class PageFragment extends Fragment {
                     }
                 });
     }
+
     //-----------------
     private void disposeWhenDestroy() {
         if(this.disposable != null && !this.disposable.isDisposed()) {
             this.disposable.dispose();
         }
     }
+
     //----------------------
     //UPDATE UI
     //---------------------
@@ -147,6 +145,4 @@ public class PageFragment extends Fragment {
         topStoriesResultList.addAll(results);
         adapter.notifyDataSetChanged();
     }
-    //----------------------
-
 }

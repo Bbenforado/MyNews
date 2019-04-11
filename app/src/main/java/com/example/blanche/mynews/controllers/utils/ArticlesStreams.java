@@ -28,16 +28,8 @@ public class ArticlesStreams {
                 .timeout(10, TimeUnit.SECONDS);
     }
 
-   // public static Observable<SearchArticleObject> streamFetchSearchedArticle(String beginDate, String endDate, String category, String keyword, String apikey) {
-     //   return nyTimesService.getArticleBySearch(beginDate, endDate, category, keyword, apikey)
-     //           .subscribeOn(Schedulers.io())
-     //           .observeOn(AndroidSchedulers.mainThread())
-     //           .timeout(10, TimeUnit.SECONDS);
-   // }
-
     public static Observable<SearchArticleObject> streamFetchSearchedArticle(String beginDate, String endDate, String category, String keyword, String sort, String apikey) {
-        NyTimesService articleService = NyTimesService.retrofitSearch.create(NyTimesService.class);
-        return articleService.getArticleBySearch(beginDate, endDate, category, keyword, sort, apikey)
+        return nyTimesService.getArticleBySearch(beginDate,endDate,category,keyword, sort, apikey)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .timeout(10, TimeUnit.SECONDS);
