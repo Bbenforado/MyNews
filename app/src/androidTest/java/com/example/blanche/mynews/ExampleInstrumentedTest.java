@@ -189,7 +189,13 @@ public class ExampleInstrumentedTest {
         //try with two keywords and two categories
         setPreferencesToNull();
         onView(withId(R.id.edit_search)).perform(clearText());
-        activityTestRule.getActivity().uncheckCheckBoxes();
+        runOnUiThread(new Runnable() {
+            public void run() {
+                // Do stuff…
+                activityTestRule.getActivity().uncheckCheckBoxes();
+            }
+        });
+
         onView(withId(R.id.edit_search)).perform(typeText("Something else"), closeSoftKeyboard());
         onView(withText("Arts")).perform(click());
         onView(withText("Business")).perform(click());
@@ -230,10 +236,15 @@ public class ExampleInstrumentedTest {
         }
     }
     @After
-    public void after() {
+    public void after() throws Throwable {
         setPreferencesToNull();
         onView(withId(R.id.edit_search)).perform(clearText());
-        activityTestRule.getActivity().uncheckCheckBoxes();
+        runOnUiThread(new Runnable() {
+                public void run() {
+                    // Do stuff…
+                    activityTestRule.getActivity().uncheckCheckBoxes(); }
+            });
+
     }
     //------------------------------------
     //TESTS STREAM THAT FETCH THE TOP STORIES
@@ -361,24 +372,26 @@ public class ExampleInstrumentedTest {
     }
 
     @Test
-    public void searchArticleStatusIsOkTest() throws Exception {
+    public void searchArticleReceivedObjectIsCorrectTest() throws Exception {
         Observable<SearchArticleObject> observable = ArticlesStreams.streamFetchSearchedArticle("20130102", "20140102", "business", "economic", "newest", "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS");
         TestObserver<SearchArticleObject> testObserver = new TestObserver<>();
         observable.subscribeWith(testObserver)
                 .assertNoErrors()
                 .assertNoTimeout()
                 .awaitTerminalEvent();
-        if(testObserver.values().get(0) != null) {
-            SearchArticleObject searchObject = testObserver.values().get(0);
-            assertEquals("OK", searchObject.getStatus());
-            SearchArticleResponse response = searchObject.getResponse();
-            if(response.getArticles().size() != 0) {
-                SearchArticle article = response.getArticles().get(0);
-                assertNotNull(article.getHeadline().getMain());
-                assertNotNull(article.getWebUrl());
-                if(article.getMultimedia().size() != 0) {
-                    SearchArticleMultimedium media = article.getMultimedia().get(0);
-                    assertNotNull(media.getUrl());
+        if (testObserver.values().size() != 0) {
+            if (testObserver.values().get(0) != null) {
+                SearchArticleObject searchObject = testObserver.values().get(0);
+                assertEquals("OK", searchObject.getStatus());
+                SearchArticleResponse response = searchObject.getResponse();
+                if (response.getArticles().size() != 0) {
+                    SearchArticle article = response.getArticles().get(0);
+                    assertNotNull(article.getHeadline().getMain());
+                    assertNotNull(article.getWebUrl());
+                    if (article.getMultimedia().size() != 0) {
+                        SearchArticleMultimedium media = article.getMultimedia().get(0);
+                        assertNotNull(media.getUrl());
+                    }
                 }
             }
         }

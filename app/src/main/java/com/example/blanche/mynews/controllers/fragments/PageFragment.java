@@ -120,6 +120,7 @@ public class PageFragment extends Fragment {
                     @Override
                     public void onError(Throwable e) {
                         Log.e("TAG", "erreur");
+                        Log.getStackTraceString(e);
                     }
 
                     @Override
