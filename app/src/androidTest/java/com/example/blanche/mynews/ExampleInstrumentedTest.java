@@ -184,7 +184,7 @@ public class ExampleInstrumentedTest {
         activityTestRule.getActivity().saveData();
 
         assertEquals("Something", preferences.getString(KEYWORD_SEARCH, null));
-        assertEquals('"' + "arts" + '"', preferences.getString(CATEGORIES_SEARCH, null));
+        assertEquals('"' + "arts" + '"' + " ", preferences.getString(CATEGORIES_SEARCH, null));
 
         //try with two keywords and two categories
         setPreferencesToNull();
@@ -202,7 +202,7 @@ public class ExampleInstrumentedTest {
         activityTestRule.getActivity().saveData();
 
         assertEquals("Something else", preferences.getString(KEYWORD_SEARCH, null));
-        assertEquals('"' + "arts" + '"' + " " + '"' + "business" + '"', preferences.getString(CATEGORIES_SEARCH, null));
+        assertEquals('"' + "arts" + '"' + " " + '"' + "business" + '"' + " ", preferences.getString(CATEGORIES_SEARCH, null));
     }
 
     //OPEN THE SEARCH

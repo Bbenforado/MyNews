@@ -1,7 +1,6 @@
 package com.example.blanche.mynews.controllers.activities;
 
 import android.app.DatePickerDialog;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.ActionBar;
@@ -21,6 +20,9 @@ import android.widget.Switch;
 import android.widget.Toast;
 import com.example.blanche.mynews.controllers.utils.GetArticlesWorker;
 import com.example.blanche.mynews.R;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import java.lang.reflect.Type;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -56,20 +58,6 @@ public class SearchActivity extends AppCompatActivity {
     public static final String KEY_ACTIVITY = "key_activity";
     public static final String CATEGORIES_SEARCH = "categories";
     public static final String CATEGORIES_NOTIFICATION = "categories_notif";
-    public static final String ARTS = "arts";
-    public static final String POLITICS = "politics";
-    public static final String BUSINESS = "business";
-    public static final String SPORTS = "sports";
-    public static final String ENTREPRENEURS = "entrepreneurs";
-    public static final String TRAVEL = "travel";
-
-    public static final String ARTS_NOTIF = "artsNotif";
-    public static final String POLITICS_NOTIF = "politicsNotif";
-    public static final String BUSINESS_NOTIF = "businessNotif";
-    public static final String SPORTS_NOTIF = "sportsNotif";
-    public static final String ENTREPRENEURS_NOTIF = "entrepreneursNotif";
-    public static final String TRAVEL_NOTIF = "travelNotif";
-
     public static final String KEYWORD_SEARCH = "keyword";
     public static final String KEYWORD_NOTIFICATION = "keyword_notif";
     public static final String BEGIN_DATE = "begin_date";
@@ -81,6 +69,11 @@ public class SearchActivity extends AppCompatActivity {
     public static final String SWITCH_BUTTON_STATE = "state";
     private PeriodicWorkRequest periodicRequest;
     public static final String IS_THE_FIRST_NOTIFICATION = "notification";
+    public static final String SEARCH_CATEGORY_STATE = "search_state";
+    public static final String NOTIF_CATEGORY_STATE = "notif_state";
+    private boolean[] searchCategoryState = new boolean[6];
+    private boolean[] notifCategoryState = new boolean[6];
+    private String[] categories = {"arts", "politics", "business", "sports", "entrepreneurs", "travel"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,8 +89,20 @@ public class SearchActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         //here we have to save the preferences, keyword and categories
+        //for search activity
         if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
             saveData();
+            if (editText.getText().toString().length() == 0) {
+                preferences.edit().putString(KEYWORD_SEARCH, null).apply();
+            }
+        }
+        //for notification activity
+        if (preferences.getInt(KEY_ACTIVITY, -1) ==1) {
+            if (preferences.getInt(SWITCH_BUTTON_STATE, -1) == 0) {
+                saveDataForNotificationActivity(true);
+            } else if (preferences.getInt(SWITCH_BUTTON_STATE, -1) == 1) {
+                saveDataForNotificationActivity(false);
+            }
         }
     }
 
@@ -118,11 +123,19 @@ public class SearchActivity extends AppCompatActivity {
     //SEARCH ACTIVITY
     //---------------------
     private void configureDatesButtons() {
-        if (preferences.getString(BEGIN_DATE, null) != null) {
-            beginDateButton.setText(changeSavedDateFormat(preferences.getString(BEGIN_DATE, null)));
-        }
-        if (preferences.getString(END_DATE, null) != null) {
-            endDateButton.setText(changeSavedDateFormat(preferences.getString(END_DATE, null)));
+        if (preferences.getString(KEYWORD_SEARCH, null) != null) {
+            if (preferences.getString(BEGIN_DATE, null) != null) {
+                beginDateButton.setText(changeSavedDateFormat(preferences.getString(BEGIN_DATE, null)));
+            }
+            if (preferences.getString(END_DATE, null) != null) {
+                endDateButton.setText(changeSavedDateFormat(preferences.getString(END_DATE, null)));
+            }
+        } else {
+            beginDateButton.setHint(getCurrentDate());
+            endDateButton.setHint(getCurrentDate());
+            preferences.edit().putString(BEGIN_DATE, null).apply();
+            preferences.edit().putString(END_DATE, null).apply();
+            uncheckCheckBoxes();
         }
     }
 
@@ -150,6 +163,7 @@ public class SearchActivity extends AppCompatActivity {
                     }
                 } else {
                     Toast.makeText(getApplicationContext(), "You have to enter at least one keyword and check one category!", Toast.LENGTH_SHORT).show();
+                    switchButton.setChecked(false);
                 }
             }
         });
@@ -164,7 +178,7 @@ public class SearchActivity extends AppCompatActivity {
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build();
 
-        periodicRequest = new PeriodicWorkRequest.Builder(GetArticlesWorker.class, 15, TimeUnit.MINUTES)
+        periodicRequest = new PeriodicWorkRequest.Builder(GetArticlesWorker.class, 24, TimeUnit.HOURS)
                 .addTag("periodicJob")
                 .setConstraints(constraints)
                 .setInputData(data)
@@ -179,6 +193,7 @@ public class SearchActivity extends AppCompatActivity {
     @OnClick(R.id.search_button)
     public void submit(View view) {
         if (!paramsAreMissing()) {
+            saveData();
             launchSearchArticlesActivity();
         } else {
             Toast.makeText(this, R.string.toast_text_no_keyword_no_checked_category, Toast.LENGTH_SHORT).show();
@@ -305,27 +320,6 @@ public class SearchActivity extends AppCompatActivity {
         startActivity(searchArticlesActivity);
     }
 
-    private void setCheckedCategoriesForSearchPage() {
-        if (preferences.getString(ARTS, null) != null) {
-            checkboxArts.setChecked(true);
-        }
-        if (preferences.getString(POLITICS, null) != null) {
-            checkboxPolitics.setChecked(true);
-        }
-        if (preferences.getString(BUSINESS, null) != null) {
-            checkboxBusiness.setChecked(true);
-        }
-        if (preferences.getString(SPORTS, null) != null) {
-            checkboxSports.setChecked(true);
-        }
-        if (preferences.getString(ENTREPRENEURS, null) != null) {
-            checkboxEntrepreneurs.setChecked(true);
-        }
-        if (preferences.getString(TRAVEL, null) != null) {
-            checkboxTravel.setChecked(true);
-        }
-    }
-
     //FOR NOTIFICATIONS
     //------------------------------------
     /**
@@ -333,30 +327,13 @@ public class SearchActivity extends AppCompatActivity {
      */
     private void displaySwitchButtonState() {
         if (preferences.getInt(SWITCH_BUTTON_STATE, -1) == 0) {
-            switchButton.setChecked(true);
+            if (paramsAreMissing()) {
+                switchButton.setChecked(false);
+            } else {
+                switchButton.setChecked(true);
+            }
         } else {
             switchButton.setChecked(false);
-        }
-    }
-
-    private void setCheckedCategoriesForNotificationPage() {
-        if (preferences.getString(ARTS_NOTIF, null) != null) {
-            checkboxArts.setChecked(true);
-        }
-        if (preferences.getString(POLITICS_NOTIF, null) != null) {
-            checkboxPolitics.setChecked(true);
-        }
-        if (preferences.getString(BUSINESS_NOTIF, null) != null) {
-            checkboxBusiness.setChecked(true);
-        }
-        if (preferences.getString(SPORTS_NOTIF, null) != null) {
-            checkboxSports.setChecked(true);
-        }
-        if (preferences.getString(ENTREPRENEURS_NOTIF, null) != null) {
-            checkboxEntrepreneurs.setChecked(true);
-        }
-        if (preferences.getString(TRAVEL_NOTIF, null) != null) {
-            checkboxTravel.setChecked(true);
         }
     }
 
@@ -364,21 +341,14 @@ public class SearchActivity extends AppCompatActivity {
     //---------------------------------
     /**
      * verify that keyword is written AND a category is checked
-     * @return true: if the param are missing
-     *         false: if it's correct
+     * @return true: if the params are missing
+     *         false: if no params are missing
      */
     private boolean paramsAreMissing() {
-        if (TextUtils.isEmpty(editText.getText().toString()) && !checkboxArts.isChecked() && !checkboxPolitics.isChecked() && !checkboxBusiness.isChecked()
+        return TextUtils.isEmpty(editText.getText().toString()) && !checkboxArts.isChecked() && !checkboxPolitics.isChecked() && !checkboxBusiness.isChecked()
                 && !checkboxSports.isChecked() && !checkboxEntrepreneurs.isChecked() && !checkboxTravel.isChecked() || TextUtils.isEmpty(editText.getText().toString()) ||
                 !checkboxArts.isChecked() && !checkboxPolitics.isChecked() && !checkboxBusiness.isChecked()
-                        && !checkboxSports.isChecked() && !checkboxEntrepreneurs.isChecked() && !checkboxTravel.isChecked()) {
-            if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
-                switchButton.setChecked(false);
-            }
-            return true;
-        } else {
-            return false;
-        }
+                        && !checkboxSports.isChecked() && !checkboxEntrepreneurs.isChecked() && !checkboxTravel.isChecked();
     }
 
     /**
@@ -393,6 +363,8 @@ public class SearchActivity extends AppCompatActivity {
         }
         if (preferences.getString(KEYWORD_NOTIFICATION, null) != null && preferences.getInt(KEY_ACTIVITY, -1) == 1) {
             editText.setText(preferences.getString(KEYWORD_NOTIFICATION, null));
+        } else {
+            editText.setHint(R.string.query_item);
         }
     }
 
@@ -408,20 +380,22 @@ public class SearchActivity extends AppCompatActivity {
             switchButton.setVisibility(View.VISIBLE);
             surfaceView.setVisibility(View.VISIBLE);
             actionBar.setTitle("Notifications");
-            configureSwitchButton();
             if (preferences.getInt(SWITCH_BUTTON_STATE, -1) == 0) {
-                setSavedCheckedCategories();
+                setCategoriesState();
+                setCurrentKeyword();
             }
+            configureSwitchButton();
         } else if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
             switchButton.setVisibility(View.GONE);
             surfaceView.setVisibility(View.GONE);
             layoutDates.setVisibility(View.VISIBLE);
             layoutSpinners.setVisibility(View.VISIBLE);
             button.setVisibility(View.VISIBLE);
-            setSavedCheckedCategories();
+            setCategoriesState();
             configureDatesButtons();
+            setCurrentKeyword();
         }
-        setCurrentKeyword();
+
     }
 
     /**
@@ -436,122 +410,64 @@ public class SearchActivity extends AppCompatActivity {
         checkboxTravel.setChecked(false);
     }
 
-    /**
-     * set the categories state (checked or not) depending on the activity displayed and on the state saved
-     */
-    private void setSavedCheckedCategories() {
-        if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
-            setCheckedCategoriesForSearchPage();
-        } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
-            setCheckedCategoriesForNotificationPage();
-        }
-    }
-
     //-----------------------------
     //SAVE DATA
     //-----------------------------------------
     //FOR BOTH
     //----------------------
     /**
-     * checks which checkbox is checked or not
-     * creates a string with the categories names of all the checked boxes
-     * saves this string in preferences, depending on the activity displayed
-     * saves all the states of checkboxes, depending on activity displayed in preferences
+     * creates a string with all categories checked
+     * saves it in preferences
+     * saves if a checkbox is checked or not
+     * saves it in preferences with gson
+     * @param stateOfCheckboxes array of boolean for state of checkboxes: true if checkbox is checked, false if not
      */
-    public void getCheckedCheckboxes() {
+    private void saveCategoriesState(boolean[] stateOfCheckboxes) {
         StringBuilder stringBuilder = new StringBuilder();
-        if (checkboxArts.isChecked()) {
-            stringBuilder.append('"' + "arts" + '"');
-            if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
-                preferences.edit().putString(ARTS, "true").apply();
-            } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
-                preferences.edit().putString(ARTS_NOTIF, "true").apply();
-            }
-        } else {
-            if (preferences.getInt(KEY_ACTIVITY,-1) == 0) {
-                preferences.edit().putString(ARTS, null).apply();
-            } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
-                preferences.edit().putString(ARTS_NOTIF, null).apply();
+        String categoriesSelected = null;
+        Gson gson = new Gson();
+        CheckBox[] checkBoxes = {checkboxArts, checkboxPolitics, checkboxBusiness, checkboxSports, checkboxEntrepreneurs, checkboxTravel};
+        for (int i = 0; i < checkBoxes.length; i++) {
+            stateOfCheckboxes[i] = checkBoxes[i].isChecked();
+            if (stateOfCheckboxes[i]) {
+                stringBuilder.append('"' + categories[i] + '"' + " ");
+                categoriesSelected = stringBuilder.toString();
             }
         }
-        if (checkboxPolitics.isChecked()) {
-            stringBuilder.append(" " + '"' + "politics" + '"');
-            if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
-                preferences.edit().putString(POLITICS, "true").apply();
-            } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
-                preferences.edit().putString(POLITICS_NOTIF, "true").apply();
-            }
-        } else {
-            if (preferences.getInt(KEY_ACTIVITY,-1) == 0) {
-                preferences.edit().putString(POLITICS, null).apply();
-            } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
-                preferences.edit().putString(POLITICS_NOTIF, null).apply();
-            }
-        }
-        if (checkboxBusiness.isChecked()) {
-            stringBuilder.append(" " + '"' + "business" + '"');
-            if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
-                preferences.edit().putString(BUSINESS, "true").apply();
-            } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
-                preferences.edit().putString(BUSINESS_NOTIF, "true").apply();
-            }
-        } else {
-            if (preferences.getInt(KEY_ACTIVITY,-1) == 0) {
-                preferences.edit().putString(BUSINESS, null).apply();
-            } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
-                preferences.edit().putString(BUSINESS_NOTIF, null).apply();
-            }
-        }
-        if (checkboxSports.isChecked()) {
-            stringBuilder.append(" " + '"' + "sports" + '"');
-            if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
-                preferences.edit().putString(SPORTS, "true").apply();
-            } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
-                preferences.edit().putString(SPORTS_NOTIF, "true").apply();
-            }
-        } else {
-            if (preferences.getInt(KEY_ACTIVITY,-1) == 0) {
-                preferences.edit().putString(SPORTS, null).apply();
-            } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
-                preferences.edit().putString(SPORTS_NOTIF, null).apply();
-            }
-        }
-        if (checkboxEntrepreneurs.isChecked()) {
-            stringBuilder.append(" " + '"' + "entrepreneurs" + '"');
-            if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
-                preferences.edit().putString(ENTREPRENEURS, "true").apply();
-            } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
-                preferences.edit().putString(ENTREPRENEURS_NOTIF, "true").apply();
-            }
-        } else {
-            if (preferences.getInt(KEY_ACTIVITY,-1) == 0) {
-                preferences.edit().putString(ENTREPRENEURS, null).apply();
-            } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
-                preferences.edit().putString(ENTREPRENEURS_NOTIF, null).apply();
-            }
-        }
-        if (checkboxTravel.isChecked()) {
-            stringBuilder.append(" " + '"' + "travel" + '"');
-            if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
-                preferences.edit().putString(TRAVEL, "true").apply();
-            } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
-                preferences.edit().putString(TRAVEL_NOTIF, "true").apply();
-            }
-        } else {
-            if (preferences.getInt(KEY_ACTIVITY,-1) == 0) {
-                preferences.edit().putString(TRAVEL, null).apply();
-            } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
-                preferences.edit().putString(TRAVEL_NOTIF, null).apply();
-            }
-        }
-        String categories = stringBuilder.toString();
-        //if it s search activity we save it in search preferences
         if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
-            preferences.edit().putString(CATEGORIES_SEARCH, categories).apply();
-        } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
+            //we save the string for the request
+            preferences.edit().putString(CATEGORIES_SEARCH, categoriesSelected).apply();
+            //we save the array of state of checkboxes
+            preferences.edit().putString(SEARCH_CATEGORY_STATE, gson.toJson(stateOfCheckboxes)).apply();
 
-            //if it s notification activity we save it in notifications preferences
-            preferences.edit().putString(CATEGORIES_NOTIFICATION, categories).apply();
+        } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
+            //we save the string for the request
+            preferences.edit().putString(CATEGORIES_NOTIFICATION, categoriesSelected).apply();
+            preferences.edit().putString(NOTIF_CATEGORY_STATE, gson.toJson(stateOfCheckboxes)).apply();
+        }
+    }
+
+    /**
+     * retrieve the state of the checkboxes (checked or not) and check/uncheck them
+     */
+    private void setCategoriesState() {
+        CheckBox[] checkBoxes = {checkboxArts, checkboxPolitics, checkboxBusiness, checkboxSports, checkboxEntrepreneurs, checkboxTravel};
+        boolean[] arrayOfState;
+        String json = "";
+        Gson gson = new Gson();
+        if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
+            json = preferences.getString(SEARCH_CATEGORY_STATE, null);
+        } else if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
+            json = preferences.getString(NOTIF_CATEGORY_STATE, null);
+        }
+        Type type = new TypeToken<boolean[]>() {}.getType();
+        arrayOfState = gson.fromJson(json, type);
+        if (arrayOfState == null) {
+            arrayOfState = new boolean[6];
+        }
+        for (int i = 0; i < checkBoxes.length; i++) {
+            //we check the box if it's true and uncheck if false
+            checkBoxes[i].setChecked(arrayOfState[i]);
         }
     }
 
@@ -560,7 +476,7 @@ public class SearchActivity extends AppCompatActivity {
     //-----------------------
     /**
      * save the selected date when click on the OK button of the datePickerDialog
-     * @param v
+     * @param v the view we clicked on
      * @param dayOfMonth
      * @param month
      * @param year
@@ -575,11 +491,15 @@ public class SearchActivity extends AppCompatActivity {
                 preferences.edit().putString(BEGIN_DATE, strYear + strMonth + strDay).apply();
                 break;
             case R.id.spinner_button_end_date:
-                if (isBeginDateBeforeEndDate(dayOfMonth, month, year)) {
-                    endDateButton.setText(strDay + "/" + strMonth + "/" + strYear);
-                    preferences.edit().putString(END_DATE, strYear + strMonth + strDay).apply();
+                if (beginDateButton.getText().toString().length() != 0) {
+                    if (isBeginDateBeforeEndDate(dayOfMonth, month, year)) {
+                        endDateButton.setText(strDay + "/" + strMonth + "/" + strYear);
+                        preferences.edit().putString(END_DATE, strYear + strMonth + strDay).apply();
+                    } else {
+                        Toast.makeText(this, "You have to select a date after the begin date...", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
-                    Toast.makeText(this, "You have to select a date after the begin date...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "You have to select a begin date first!", Toast.LENGTH_SHORT).show();
                 }
                 break;
             default:
@@ -593,7 +513,7 @@ public class SearchActivity extends AppCompatActivity {
     public void saveData() {
         if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
             preferences.edit().putString(KEYWORD_SEARCH, editText.getText().toString()).apply();
-            getCheckedCheckboxes();
+            saveCategoriesState(searchCategoryState);
         }
     }
 
@@ -607,9 +527,9 @@ public class SearchActivity extends AppCompatActivity {
     public void saveDataForNotificationActivity(Boolean isChecked) {
         if (isChecked) {
             preferences.edit().putString(IS_THE_FIRST_NOTIFICATION, "true").apply();
-            preferences.edit().putString(KEYWORD_NOTIFICATION, editText.getText().toString()).apply();
             preferences.edit().putInt(SWITCH_BUTTON_STATE, 0).apply();
-            getCheckedCheckboxes();
+            preferences.edit().putString(KEYWORD_NOTIFICATION, editText.getText().toString()).apply();
+            saveCategoriesState(notifCategoryState);
         } else {
             preferences.edit().putInt(SWITCH_BUTTON_STATE, 1).apply();
             preferences.edit().putString(KEYWORD_NOTIFICATION, null).apply();
