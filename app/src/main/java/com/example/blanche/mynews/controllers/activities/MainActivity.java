@@ -19,8 +19,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-
-
 import com.example.blanche.mynews.R;
 import com.example.blanche.mynews.controllers.adapters.PageAdapter;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -175,7 +173,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     //-----------------
-
     /**
      * verify if there is a internet connection
      * @return
@@ -186,7 +183,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
-
 
     private void launchSearchedArticleActivity() {
         Intent searchArticleActivity = new Intent(this, ArticlesByCategoryActivity.class);
@@ -227,6 +223,4 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Log.e("SecurityException", "Google Play Services not available.");
         }
     }
-
-
 }

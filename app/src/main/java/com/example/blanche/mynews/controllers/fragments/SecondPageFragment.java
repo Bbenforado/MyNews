@@ -38,7 +38,6 @@ public class SecondPageFragment extends Fragment {
     @BindView(R.id.fragment_second_page_recycler_view) RecyclerView recyclerView;
     @BindView(R.id.fragment_second_page_swipe_container)
     SwipeRefreshLayout swipeRefreshLayout;
-
     private List<MostPopularResult> mostPopularResultList;
     private RecyclerViewAdapterSecondFragment adapter;
     private Disposable disposable;

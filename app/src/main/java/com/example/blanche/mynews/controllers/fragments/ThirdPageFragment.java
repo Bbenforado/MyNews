@@ -11,23 +11,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.bumptech.glide.Glide;
 import com.example.blanche.mynews.R;
 import com.example.blanche.mynews.controllers.activities.WebviewActivity;
-import com.example.blanche.mynews.controllers.adapters.RecyclerViewAdapterSecondFragment;
 import com.example.blanche.mynews.controllers.adapters.RecyclerViewAdapterThirdFragment;
 import com.example.blanche.mynews.controllers.utils.ArticlesStreams;
 import com.example.blanche.mynews.controllers.utils.ItemClickSupport;
-import com.example.blanche.mynews.models.MostPopular.MostPopular;
-import com.example.blanche.mynews.models.MostPopular.MostPopularResult;
 import com.example.blanche.mynews.models.SearchArticles.SearchArticle;
 import com.example.blanche.mynews.models.SearchArticles.SearchArticleObject;
-import com.example.blanche.mynews.models.TopStories.TopStoriesResult;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.disposables.Disposable;
@@ -40,14 +33,12 @@ public class ThirdPageFragment extends Fragment {
     public static final String KEY_POSITION = "position";
     public static final String KEY_ARTICLE = "key_article";
     public static final String ARTICLE_TITLE = "article_title";
-
-    @BindView(R.id.fragment_third_second_page_recycler_view) RecyclerView recyclerView;
-    @BindView(R.id.fragment_third_page_swipe_container) SwipeRefreshLayout swipeRefreshLayout;
-
     private List<SearchArticle> searchArticleList;
     private RecyclerViewAdapterThirdFragment adapter;
     private Disposable disposable;
-    Bundle bundle;
+    private Bundle bundle;
+    @BindView(R.id.fragment_third_second_page_recycler_view) RecyclerView recyclerView;
+    @BindView(R.id.fragment_third_page_swipe_container) SwipeRefreshLayout swipeRefreshLayout;
 
     //CONSTRUCTOR
     public ThirdPageFragment() {

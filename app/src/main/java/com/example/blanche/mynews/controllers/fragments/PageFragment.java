@@ -16,7 +16,6 @@ import com.example.blanche.mynews.controllers.adapters.RecyclerViewAdapter;
 import com.example.blanche.mynews.controllers.utils.ArticlesStreams;
 import com.example.blanche.mynews.controllers.utils.ItemClickSupport;
 import com.example.blanche.mynews.models.TopStories.TopStories;
-import com.example.blanche.mynews.models.TopStories.TopStoriesMultimedia;
 import com.example.blanche.mynews.models.TopStories.TopStoriesResult;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,13 +29,12 @@ public class PageFragment extends Fragment {
     public static final String KEY_POSITION = "position";
     public static final String KEY_ARTICLE = "key_article";
     public static final String ARTICLE_TITLE = "article_title";
-
-    @BindView(R.id.fragment_page_recycler_view) RecyclerView recyclerView;
-    @BindView(R.id.fragment_page_swipe_container) SwipeRefreshLayout swipeRefreshLayout;
     private List<TopStoriesResult> topStoriesResultList;
     private RecyclerViewAdapter adapter;
     private Disposable disposable;
     Bundle bundle;
+    @BindView(R.id.fragment_page_recycler_view) RecyclerView recyclerView;
+    @BindView(R.id.fragment_page_swipe_container) SwipeRefreshLayout swipeRefreshLayout;
 
     //CONSTRUCTOR
     public PageFragment() {
@@ -56,7 +54,6 @@ public class PageFragment extends Fragment {
                              Bundle savedInstanceState) {
             View result = inflater.inflate(R.layout.fragment_page, container, false);
             ButterKnife.bind(this, result);
-
             configureRecyclerView();
             configureSwipeRefreshLayout();
             executeHttpRequestTopStories();

@@ -24,7 +24,6 @@ public class WebviewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_webview);
         ButterKnife.bind(this);
-
         bundle = getIntent().getExtras();
         configureToolbar();
         webView.loadUrl(bundle.getString(KEY_ARTICLE));

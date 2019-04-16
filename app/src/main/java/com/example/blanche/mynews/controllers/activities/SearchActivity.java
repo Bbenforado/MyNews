@@ -38,6 +38,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+/**
+ * Activity that displays the searching tool
+ */
 public class SearchActivity extends AppCompatActivity {
     //BINDVIEWS
     @BindView(R.id.search_button) Button button;
@@ -150,6 +153,8 @@ public class SearchActivity extends AppCompatActivity {
                 if (!paramsAreMissing()) {
 
                     if (isChecked) {
+                        //begin the work request
+                        preferences.edit().putString(IS_THE_FIRST_NOTIFICATION, "true").apply();
                         saveDataForNotificationActivity(true);
                         configureWorkRequest();
                         WorkManager.getInstance().enqueueUniquePeriodicWork("periodic_work", ExistingPeriodicWorkPolicy.REPLACE, periodicRequest);
@@ -252,7 +257,8 @@ public class SearchActivity extends AppCompatActivity {
      * @param day
      * @param month
      * @param year
-     * @return
+     * @return true if the end date is after the begin date
+     *          false if the end date is before the begin date
      */
     private boolean isBeginDateBeforeEndDate(int day, int month, int year) {
         String dateBegin = beginDateButton.getText().toString();
@@ -373,7 +379,7 @@ public class SearchActivity extends AppCompatActivity {
      */
     public void displayNotificationOrSearchScreen() {
         if (preferences.getInt(KEY_ACTIVITY, -1) == 1) {
-            //display notification
+            //display notification activity
             layoutDates.setVisibility(View.GONE);
             layoutSpinners.setVisibility(View.GONE);
             button.setVisibility(View.GONE);
@@ -386,6 +392,7 @@ public class SearchActivity extends AppCompatActivity {
             }
             configureSwitchButton();
         } else if (preferences.getInt(KEY_ACTIVITY, -1) == 0) {
+            //display search activity
             switchButton.setVisibility(View.GONE);
             surfaceView.setVisibility(View.GONE);
             layoutDates.setVisibility(View.VISIBLE);
@@ -424,7 +431,7 @@ public class SearchActivity extends AppCompatActivity {
      */
     private void saveCategoriesState(boolean[] stateOfCheckboxes) {
         StringBuilder stringBuilder = new StringBuilder();
-        String categoriesSelected = null;
+        String categoriesSelected = "";
         Gson gson = new Gson();
         CheckBox[] checkBoxes = {checkboxArts, checkboxPolitics, checkboxBusiness, checkboxSports, checkboxEntrepreneurs, checkboxTravel};
         for (int i = 0; i < checkBoxes.length; i++) {
@@ -526,7 +533,6 @@ public class SearchActivity extends AppCompatActivity {
      */
     public void saveDataForNotificationActivity(Boolean isChecked) {
         if (isChecked) {
-            preferences.edit().putString(IS_THE_FIRST_NOTIFICATION, "true").apply();
             preferences.edit().putInt(SWITCH_BUTTON_STATE, 0).apply();
             preferences.edit().putString(KEYWORD_NOTIFICATION, editText.getText().toString()).apply();
             saveCategoriesState(notifCategoryState);

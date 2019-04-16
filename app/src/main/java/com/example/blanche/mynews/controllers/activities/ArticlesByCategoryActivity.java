@@ -29,6 +29,10 @@ import butterknife.ButterKnife;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 
+/**
+ * ArticlesByCategoryActivity is an activity that displays the articles, depending on which category the user clicked on,
+ * in the navigation drawer
+ */
 public class ArticlesByCategoryActivity extends AppCompatActivity {
 
     private List<SearchArticle> searchArticleList;

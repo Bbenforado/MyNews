@@ -23,12 +23,10 @@ import static android.content.Context.MODE_PRIVATE;
  * by sending a notification
  */
 public class GetArticlesWorker extends Worker {
-    private SharedPreferences preferences;
     public static final String APP_PREFERENCES = "appPreferences";
     public static final String IS_THE_FIRST_NOTIFICATION = "notification";
     public static final String CATEGORIES_WORKER = "categories";
     public static final String KEYWORD_WORKER= "keyword";
-    private Disposable disposable;
     private int size;
 
     public GetArticlesWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
@@ -38,15 +36,14 @@ public class GetArticlesWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-
-        preferences = getApplicationContext().getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
+        SharedPreferences preferences = getApplicationContext().getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
         //get the strings that will be passed as param
         String isTheFirstNotification = preferences.getString(IS_THE_FIRST_NOTIFICATION, null);
         String categories = getInputData().getString(CATEGORIES_WORKER);
         String dataKeyword = getInputData().getString(KEYWORD_WORKER);
         String keyword = "headline:(\""+ dataKeyword +"\")";
 
-        //first notification is immediate, but we want it only once a day, so won't send the first notification
+        //first notification is immediate, but we want it only once a day and not immediately, so won't send the first notification
         //if it's not the first time, we can send notification
         if (isTheFirstNotification.equals("false")) {
             executeHttpRequest(null, null, categories, keyword);
@@ -55,7 +52,7 @@ public class GetArticlesWorker extends Worker {
         return Result.success();
     }
 
-    public void sendNotification(String title, String message) {
+    private void sendNotification(String title, String message) {
             NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
 
             //If on Oreo then notification required a notification channel.
@@ -75,29 +72,28 @@ public class GetArticlesWorker extends Worker {
     }
 
     public void executeHttpRequest(String beginDate, String endDate, String category, String keyword) {
-        this.disposable =
-                ArticlesStreams.streamFetchSearchedArticle(beginDate, endDate, category, keyword, "newest", "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS")
-                        .subscribeWith(new DisposableObserver<SearchArticleObject>() {
+        Disposable disposable = ArticlesStreams.streamFetchSearchedArticle(beginDate, endDate, category, keyword, "newest", "TL8pNgjOXgnrDvkaCjdUI0N2AIvOGdyS")
+                .subscribeWith(new DisposableObserver<SearchArticleObject>() {
 
-                            @Override
-                            public void onNext(SearchArticleObject searchArticleObject) {
-                                size = 0;
-                                Log.e("TAG", "on next");
-                                SearchArticleResponse searchArticleResponse = searchArticleObject.getResponse();
-                                size = searchArticleResponse.getArticles().size();
-                                displayTextNotificationDependingOnResults(size);
-                            }
+                    @Override
+                    public void onNext(SearchArticleObject searchArticleObject) {
+                        size = 0;
+                        Log.e("TAG", "on next");
+                        SearchArticleResponse searchArticleResponse = searchArticleObject.getResponse();
+                        size = searchArticleResponse.getArticles().size();
+                        displayTextNotificationDependingOnResults(size);
+                    }
 
-                            @Override
-                            public void onError(Throwable e) {
-                                Log.e("TAG", Log.getStackTraceString(e));
-                            }
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e("TAG", Log.getStackTraceString(e));
+                    }
 
-                            @Override
-                            public void onComplete() {
-                                Log.e("TAG", "on complete");
-                            }
-                        });
+                    @Override
+                    public void onComplete() {
+                        Log.e("TAG", "on complete");
+                    }
+                });
     }
 
     /**
@@ -112,6 +108,4 @@ public class GetArticlesWorker extends Worker {
             sendNotification("Sorry...", "No articles found for the filters you chose! :(");
         }
     }
-
-
 }

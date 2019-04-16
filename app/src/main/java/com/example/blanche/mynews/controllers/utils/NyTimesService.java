@@ -3,9 +3,7 @@ package com.example.blanche.mynews.controllers.utils;
 import com.example.blanche.mynews.models.MostPopular.MostPopular;
 import com.example.blanche.mynews.models.SearchArticles.SearchArticleObject;
 import com.example.blanche.mynews.models.TopStories.TopStories;
-
 import io.reactivex.Observable;
-
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -38,7 +36,4 @@ public interface NyTimesService {
                                            @Query("fq") String keyword,
                                            @Query("sort") String sort,
                                            @Query("api-key") String apikey);
-
-
-
 }

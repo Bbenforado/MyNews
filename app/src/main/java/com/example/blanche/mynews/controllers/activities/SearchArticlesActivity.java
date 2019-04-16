@@ -27,6 +27,10 @@ import butterknife.ButterKnife;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 
+/**
+ * SearchArticlesActivity is an activity that displays the results found by the searchActivity
+ *
+ */
 public class SearchArticlesActivity extends AppCompatActivity {
 
     @BindView(R.id.activity_search_articles_recycler_view)
@@ -48,7 +52,6 @@ public class SearchArticlesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_articles);
-
         ButterKnife.bind(this);
         configureRecyclerView();
         configureToolbar();
@@ -120,8 +123,6 @@ public class SearchArticlesActivity extends AppCompatActivity {
                 Log.e("TAG", "on nextTop");
                 SearchArticleResponse response = searchArticleObject.getResponse();
                 updateUIWithArticles(response.getArticles());
-                int size = response.getArticles().size();
-                System.out.println("size = " + size);
                 if (response.getArticles().size() == 0) {
                     displayAlertDialog();
                 }

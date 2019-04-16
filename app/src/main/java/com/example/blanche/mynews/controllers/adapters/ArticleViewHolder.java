@@ -5,9 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.bumptech.glide.RequestManager;
-import com.bumptech.glide.manager.RequestManagerRetriever;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.blanche.mynews.R;
 import com.example.blanche.mynews.models.MostPopular.MostPopularMedia;
@@ -96,5 +94,4 @@ class ArticleViewHolder extends RecyclerView.ViewHolder {
             imageView.setBackgroundResource(R.drawable.ic_no_image_available);
         }
     }
-
 }
