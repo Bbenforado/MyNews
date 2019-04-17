@@ -244,7 +244,6 @@ public class ExampleInstrumentedTest {
             TopStories topStories = testObserver.values().get(0);
             if (topStories.getResults().size() != 0) {
                 TopStoriesResult result = topStories.getResults().get(0);
-                assertEquals("Arts", result.getSection());
                 assertNotNull(result.getTitle());
                 assertNotNull(result.getUrl());
                 assertEquals("OK", topStories.getStatus());
